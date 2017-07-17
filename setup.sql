@@ -1,4 +1,7 @@
 -- These tables should be created and populated before starting the tutorial.
+create database learning_center;
+
+use learning_center;
 
 create table visit (
   first_name varchar(128) not NULL,
