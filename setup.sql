@@ -1,4 +1,5 @@
--- These tables should be created and populated before starting the tutorial.
+-- This script sets up the environment expected at the beginning of the tutorial.
+
 create database learning_center;
 
 use learning_center;
@@ -37,35 +38,4 @@ insert into visit values
   ('Debbie', 'Davis', 'ddavis@dewv.net', 'Freshman', 'On campus', 'Philosophy and English', 'Women\'s soccer, Softball', NULL, NULL, '2016-08-31 13:36:36', '2016-08-31 14:47:44', 'Writing center', 'Help with paper', 'Y', NULL, NULL),
   ('Gary', 'Gatehouse', 'ggatehouse@dewv.net', 'Sophomore', 'On campus', 'Math, Comp Sci', NULL, 'Terry', 'Tutor', '2016-08-31 14:36:56', NULL, 'Albert Hall', 'study hall', NULL, NULL, NULL),
   ('Debra', 'Davis', 'ddavis@dewv.net', 'Freshman', 'On campus', 'Philosophy and English', 'Women\'s soccer, Softball', NULL, NULL, '2016-08-31 16:00:06', NULL, 'Albert Hall', 'MATH 101', NULL, NULL, NULL)
-;
-
-create table location (
-  name varchar(15),
-  description varchar(25) default NULL,
-  constraint pk primary key(name)
-);
-
-insert into location values 
-  ('Albert Hall', 'Main NLC offices'),
-  ('Writing Center', NULL),
-  ('Commuter Lounge', 'Science Center, 4th floor')
-;
-
-create table staff (
-  first_name varchar(128) not NULL,
-  last_name varchar(128) not NULL,
-  email varchar(128),
-  assistant_email varchar(128) default NULL,
-  slp_instructor_yn char(1) default 'N',
-  location varchar(15) not NULL,
-  constraint pk primary key(email),
-  constraint fk_location foreign key(location) references location(name)
-);
-
-insert into staff values
-  ('Sam', 'Studybuddy', 'sstudybuddy@dewv.net', 'ccalendar@dewv.net', 'Y', 'Albert Hall'),
-  ('Terry', 'Tutor', 'ttutor@dewv.net', 'ccalendar@dewv.net', 'Y', 'Albert Hall'),
-  ('Chris', 'Calendar', 'ccalendar@dewv.net', 'ccalendar@dewv.net', 'Y', 'Albert Hall'),
-  ('Edna', 'Editor', 'eeditor@dewv.net', 'gguardian@dewv.net', 'N', 'Writing Center'),
-  ('Greg', 'Guardian', 'gguardian@dewv.net', 'gguardian@dewv.net', 'N', 'Writing Center')
 ;
