@@ -795,7 +795,7 @@ Notice that you do not (cannot) list column names, because `DELETE` works on ent
 
 1. In the previous set of exercises, you inserted three rows. Delete them.
 
-##
+
 
 # Contents
 
