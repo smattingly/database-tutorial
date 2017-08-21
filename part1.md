@@ -550,9 +550,16 @@ In the next section, you will learn how to fix these problems.
 
 Later, you will learn how an improved database design can help prevent them from happening.
 
-### Exercises
+### Exercise set 1
 
-Write a query (a `SELECT` statement) that satisfies each of the following.
+Write a query (a `SELECT` statement) that satisfies each of the following. Once you have the correct query, use the `tee` command to store your work to a file. For example, consider the first exercise. You should:
+
+- figure out the correct query,
+- execute the MySQL command `tee exercise1-1.txt;` to begin capturing your session to a file named `exercise1-1.txt`,
+- re-execute your query so the the `SELECT` statement and its results will be written to the file, and
+- execute the command `notee;` to stop the file capture of your session.
+
+Repeat this process for each exercise, using the filename `exercise1-2.txt` for the second exercise, and so on.
 
 1. List the first and last names and check in and check out times for all closed visits.
 2. List the first and last names and check in and check out times for all closed visits by Ms. Davis.
@@ -690,7 +697,9 @@ Query OK, 9 rows affected (0.01 sec)
 Rows matched: 9  Changed: 9  Warnings: 0
 ```
 
-### Exercises
+### Exercise set 2
+
+Use the `tee <filename>;` and `notee;` commands to capture your solutions to the following exercises. Use the filename `exercise2-1.txt` for the first exercise, and so on.
 
 1. All of the students are "moving up" in academic rank. You will need to use multiple `UPDATE` statements, and plan them carefully. Update the data so that: 
    - current freshmen become sophomores, 
@@ -772,10 +781,12 @@ mysql> insert into visit (first_name) values ('Alice');
 ERROR 1364 (HY000): Field 'last_name' doesn't have a default value
 ```
 
-### Exercises
+### Exercise set 3
 
-1. Insert a row for a visit by Bob Booth. The location is SC102, and his purpose is to practice his SQL statements. Keep all of Bob's personal information consistent with the data on his other visits.
-2. Insert a row for a brand new student, using any appropriate data you can imagine. Your statement must provide a value for every column except one: allow `check_in_time` to take on its default value.
+Use the `tee <filename>;` and `notee;` commands to capture your solutions to the following exercises. Use the filename `exercise3-1.txt` for the first exercise, and so on.
+
+1. Insert a row for a visit by Bob Booth. The location is SC102, and his purpose is to practice his SQL statements. Keep all of Bob's personal information consistent with the data on his other visits. To verify your solution, execute a `SELECT` statement that returns only the newly inserted row.
+2. Insert a row for a brand new student, using any appropriate data you can imagine. Your statement must provide a value for every column except one: allow `check_in_time` to take on its default value. To verify your solution, execute a `SELECT` statement that returns only the newly inserted row.
 3. Repeat the previous exercise, using different data for another brand new student.
 
 ## Deleting data 
@@ -787,13 +798,18 @@ mysql> delete from visit where purpose = 'more study hall';
 Query OK, 1 row affected (0.02 sec)
 ```
 
-It is very important to use the correct `WHERE` clause. As before, you should first test your `WHERE` clause with a `SELECT` statement, to be sure it matches all and only the rows that you want to delete. If you do not include a `WHERE` clause, all rows in the table will be deleted. 
+It is very important to use the correct `WHERE` clause. As before, you should first test your `WHERE` clause with a `SELECT` statement, to be sure it matches all and only the rows that you want to delete. 
+
+If you do not include a `WHERE` clause, all rows in the table will be deleted. 
 
 Notice that you do not (cannot) list column names, because `DELETE` works on entire rows.
 
-### Exercises
+### Exercise set 4
 
-1. In the previous set of exercises, you inserted three rows. Delete them.
+Use the `tee <filename>;` and `notee;` commands to capture your solutions to the following exercises. Use the filename `exercise4-1.txt` for the first exercise, and so on.
+
+1. In the previous set of exercises, you inserted a new visit row. Delete it. To verify your solution, execute a `SELECT` statement that shows the row is no longer present.
+2. In the previous set of exercises, you inserted two new student rows. Use a single `DELETE` statement to delete both rows. To verify your solution, execute a `SELECT` statement that shows the rows are no longer present.
 
 
 
