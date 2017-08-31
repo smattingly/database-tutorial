@@ -1,4 +1,4 @@
-# Databases in Context: A Just-in-Time Tutorial
+# Databases in Context: A Just-in-Time Tutorial, Part 1
 
 [Steve Mattingly](https://www.linkedin.com/in/steve-mattingly-aab8064a), Assistant Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu).
 
