@@ -201,8 +201,8 @@ mysql> insert into major(name) values
     -> ('Sport Management'),
     -> ('Sustainability Studies'),
     -> ('Theatre Arts');
-Query OK, 42 rows affected (0.01 sec)
-Records: 42  Duplicates: 0  Warnings: 0
+Query OK, 43 rows affected (0.01 sec)
+Records: 43  Duplicates: 0  Warnings: 0
  ```
 
 Again, this is a complete set of domain values (drawn from the academic catalog) for the college's majors, allowing space efficiency and eliminating insert anomalies. 
