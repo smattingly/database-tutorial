@@ -90,8 +90,8 @@ Use a `CREATE TABLE` statement to make a new table to store facts about the coll
 
 ```
 mysql> create table sport (
-    -> name varchar(15),
-    -> gender varchar(5),
+    -> name varchar(15) NOT NULL,
+    -> gender varchar(5) NOT NULL,
     -> season varchar(6) NOT NULL,
     -> constraint primary key(name, gender)
     -> );
@@ -152,7 +152,7 @@ Next comes a table for facts about the college's majors. Create and populate it 
 
  ```
 mysql> create table major (
-    -> name varchar(29),
+    -> name varchar(29) NOT NULL,
     -> constraint primary key (name)
     -> );
 Query OK, 0 rows affected (0.01 sec)
@@ -277,7 +277,7 @@ mysql> CREATE TABLE `visit1nf` (
 Query OK, 0 rows affected (0.03 sec)
 ```
 
-The `NOT NULL` constraints appearing on the lines for `email` and `check_in_time` are (harmlessly) redundant. The `PRIMARY KEY` constraint ensures those columns cannot contain `NULL`s.
+The `PRIMARY KEY` constraint ensures that  `email` and `check_in_time` cannot contain `NULL`s. The `NOT NULL` constraints appearing on the lines for those columns are logically redundant, but it is best to include them because a DBMS may otherwise define a default value for the columns to prevent `NULL`s. 
 
 Now copy the contents of the unnormalized `visit` (excluding `sports` and `majors`) to `visit1nf` as follows.
 
@@ -310,9 +310,9 @@ Create and populate the `student_sport` table as follows.
 
 ```
 mysql> create table student_sport (
-    ->   email varchar(128),
-    ->   sport_name varchar(15),
-    ->   gender varchar(5),
+    ->   email varchar(128) NOT NULL,
+    ->   sport_name varchar(15) NOT NULL,
+    ->   gender varchar(5) NOT NULL,
     ->   constraint primary key(email, sport_name, gender)
     -> );
 Query OK, 0 rows affected (0.03 sec)
@@ -549,7 +549,7 @@ Create the `student` table, with the primary key $\lbrace$`email`$\rbrace$.
 mysql> create table student (
     ->   first_name varchar(128) NOT NULL,
     ->   last_name varchar(128) NOT NULL,
-    ->   email varchar(128),
+    ->   email varchar(128) NOT NULL,
     ->   academic_rank varchar(128) NOT NULL,
     ->   residential_status varchar(128) NOT NULL,
     ->   slp_instructor_first_name varchar(128) DEFAULT NULL,
@@ -563,8 +563,8 @@ Now create the `visit2nf` table.
 
 ```
 mysql> create table visit2nf (
-    ->   email varchar(128),
-    ->   check_in_time timestamp DEFAULT CURRENT_TIMESTAMP,
+    ->   email varchar(128) NOT NULL,
+    ->   check_in_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ->   check_out_time timestamp NULL DEFAULT NULL,
     ->   location varchar(128) NOT NULL,
     ->   purpose varchar(255) NOT NULL,
@@ -631,8 +631,8 @@ Create and populate the following table.
 
 ```
 mysql> create table computer(
-    ->   location varchar(128),
-    ->   cubicle varchar(16),
+    ->   location varchar(128) NOT NULL,
+    ->   cubicle varchar(16) NOT NULL,
     ->   memory int, 
     ->   printer varchar(16),
     ->   color varchar(3),
