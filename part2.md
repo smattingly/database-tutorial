@@ -581,7 +581,7 @@ Query OK, 0 rows affected (0.15 sec)
 
 The primary key of $\lbrace$`email`, `check_in_time`$\rbrace$ tells the DBMS to enforce entity integrity for visits.
 
-A **foreign key** is a set of columns that contains values drawn from the same domain as a different table's primary key. This is a way of "linking" rows in different tables. The `FOREIGN KEY` constraint tells the DBMS that `email` column values in this table refer to `email` column values in the `student` table. (This tutorial will use the name `fk_<other table>` for all foreign key constraints, where `<other table>` names the referenced table.) In other words, both columns have the same set of possible values (the same domain). This allows the DBMS to enforce **referential integrity** by ensuring that, for every `email` value that appears in `visit2nf`, there is a `student` table row with the same value in its `email` column. This has several implications.
+A **foreign key** is a set of columns that contains values drawn from the same domain as a different table's primary key. This is a way of "linking" rows in different tables. The `FOREIGN KEY` constraint tells the DBMS that `email` column values in this table refer to `email` column values in the `student` table. In other words, both columns have the same set of possible values (the same domain). This allows the DBMS to enforce **referential integrity** by ensuring that, for every `email` value that appears in `visit2nf`, there is a `student` table row with the same value in its `email` column. This has several implications.
 
 - MySQL will reject attempts to `INSERT` a `visit2nf` row with an `email` address that does not appear in the `student` table. In other words, a student's information must be in the database first, and then they can log visits. This ensures that a "link" or reference to an existing student is present when the visit is logged.
 - MySQL will reject attempts to `UPDATE` `student` table `email` values when there are `visit2nf` rows containing the same `email` values. This prevents breaking the reference by changing data.
@@ -591,7 +591,7 @@ Note that the last two points discuss constraints on the `student` table, which 
 
 There are other possible actions for referential integrity enforcement besides rejecting the attempted operation, but the details vary by DBMS. MySQL's default action is to reject operations as described above, but you can specify other actions. You can even specify different actions for different operations and for different foreign keys. 
 
-- **Cascading** updates and/or deletes. This means that the operation's effect "flows" from the "parent" table (`student` in this case) to the "child" table (`visit2nf` in this case). With cascading updates, your command `UPDATE student SET email = 'bbooth2@dewv.net' WHERE email = 'bbooth@dewv.net'` the DBMS would automatically perform an identical update on the `visit2nf` table. With cascading deletes, when you `DELETE FROM student WHERE email = 'bbooth@dewv.net';` the DBMS would automatically delete all `visit2nf` rows with that `email` value.
+- **Cascading** updates and/or deletes. This means that the operation's effect "flows" from the "parent" table (`student` in this case) to the "child" table (`visit2nf` in this case). With cascading updates, your command `UPDATE student SET email = 'bbooth2@dewv.net' WHERE email = 'bbooth@dewv.net';` the DBMS would automatically perform an identical update on the `visit2nf` table. With cascading deletes, when you `DELETE FROM student WHERE email = 'bbooth@dewv.net';` the DBMS would automatically delete all `visit2nf` rows with that `email` value.
 - Set to `NULL`. For example, when you `DELETE FROM student WHERE email = 'bbooth@dewv.net';` the DBMS would eliminate broken references by automatically executing `UPDATE visit2nf SET email to NULL where email = 'bbooth@dewv.net';` .
 
 Both `student` and `visit2nf` satisfy second normal form, because:
@@ -625,7 +625,7 @@ Where relevant, use the `tee <filename>;` and `notee;` commands to capture your 
 
 ### Third normal form and Boyce-Codd normal form
 
-Naylor Learning Center locations have computers available for student use. Suppose each computer cubicle is identified by a letter and each computer is attached to a printer-- some color printers, some not.
+Learning Center locations have computers available for student use. Suppose each computer cubicle is identified by a letter and each computer is attached to a printer-- some color printers, some not.
 
 Create and populate the following table.
 
@@ -763,7 +763,7 @@ Where relevant, use the `tee <filename>;` and `notee;` commands to capture your 
    - Use `ALTER TABLE <table name> DROP COLUMN <column name>;` to remove the problematic dependency.
    - Create and populate a new table named `printer`, with appropriate column(s) and primary key.
    - What additional change should you make to the modified `computer` table? (Hint: referential integrity)
-2. Are the modified `computer` table and the new `printer` table in BCNF?
+2. Are the modified `computer` table and the new `printer` table in BCNF? Explain.
 3. Decompose the `staff` table to satisfy BCNF. The process is similar to the first exercise above. The new table is named `location`, and has two columns: `name`, and `assistant` which respectively hold the name of the location and the staff assistant who is located there.
 4. Explain why each of the following tables is, or is not, in 3NF. `visit2nf`, `student`,  `sport` , `major`, `student_sport`, `student_major`.
 5. Explain why each of the following tables is, or is not, in BCNF. `visit2nf`, `student`,  `sport` , `major`, `student_sport`, `student_major`, `computer`, `printer`.
