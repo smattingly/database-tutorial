@@ -563,7 +563,7 @@ mysql> select avg(memory) from computer;
 3. Write a single query to answer this question: how many computers have less than 8GB of memory?
 4. Write a single query to list the locations that have more than one SLP instructor.
 
-## Subqueries and set operations 
+## Subqueries 
 
 Consider the following query.
 
@@ -653,7 +653,99 @@ mysql> select location, cubicle, memory,
 5 rows in set (0.00 sec)
 ```
 
-Because the subquery is on the same table as the main query, you must use an alias for one table instance. 
+Because the subquery is on the same table as the main query, you must use an alias for one table instance.
+
+`IN` is not the only SQL operator for use with subqueries.
+
+The `EXISTS` operator checks for the existence of records that satisfy criteria stated in the subquery. Suppose you wanted to find the sports that have athletes in the database.
+
+```
+mysql> select distinct name, gender from sport where exists 
+    -> (select * from student_sport where sport.name = student_sport.sport_name 
+    -> and sport.gender = student_sport.gender);
++----------+--------+
+| name     | gender |
++----------+--------+
+| Baseball | Men    |
+| Golf     | Men    |
+| Soccer   | Men    |
+| Soccer   | Women  |
+| Softball | Women  |
++----------+--------+
+5 rows in set (0.00 sec)
+```
+
+It is common to `SELECT *` in subqueries that follow `EXISTS` because it does not matter what columns are in the result rows; the point is just to check if there *are* any result rows.
+
+Both `IN` and `EXISTS` can be combined with `NOT`. For example, this reverses the logic of the previous query, listing sports that do not have any athletes in the database.
+
+```
+mysql> select distinct name, gender from sport where not exists 
+    -> (select * from student_sport where sport.name = student_sport.sport_name 
+    -> and sport.gender = student_sport.gender);
++-----------------+--------+
+| name            | gender |
++-----------------+--------+
+| Basketball      | Men    |
+| Basketball      | Women  |
+| Cross country   | Men    |
+| Cross country   | Women  |
+| Lacrosse        | Men    |
+| Lacrosse        | Women  |
+| Swimming        | Men    |
+| Swimming        | Women  |
+| Tennis          | Men    |
+| Tennis          | Women  |
+| Track and field | Men    |
+| Track and field | Women  |
+| Volleyball      | Women  |
++-----------------+--------+
+13 rows in set (0.00 sec)
+```
+
+The `ALL` operator applies a comparison to values from the main query and the entire set of values returned by the subquery. Say that you've heard some concerns that some locations have better computer equipment than others.
+
+```
+mysql> select location, cubicle, memory from computer a 
+    -> where memory > all (select memory from computer where computer.location <> a.location);   
++----------+---------+--------+
+| location | cubicle | memory |
++----------+---------+--------+
+| NLC      | B       |      8 |
+| NLC      | C       |      8 |
++----------+---------+--------+
+2 rows in set (0.00 sec)
+```
+
+This tells you that there are two computers, both at the NLC location, with more memory than all of the computers at other locations. 
+
+To follow up, you could use the `ANY` operator to find the computers with the least amount of memory.
+
+```
+mysql> select location, cubicle, memory from computer a 
+    -> where memory < any (select memory from computer); 
++----------------+---------+--------+
+| location       | cubicle | memory |
++----------------+---------+--------+
+| NLC            | A       |      4 |
+| Writing center | A       |      4 |
+| Writing center | B       |      4 |
++----------------+---------+--------+
+3 rows in set (0.00 sec)
+```
+
+As is often the case, this is equivalent to a subquery that uses an aggregate function. Here, you would get the same results with `select location, cubicle, memory from computer where memory = (select min(memory) from computer);`.  
+
+###Exercise set 13 
+
+Use the subquery operators introduced in this section to answer the following. Where possible, give other queries that would also return the correct results.
+
+1. List the name of all sports played by both men and women. 
+2. List every student email, their associated major(s), and the number of students who have that major.
+3. Without using an aggregate function, write a query that returns the earliest visit check in time.
+4. All students in the database have at least one major listed, even if it is listed as "Undecided". Write a query that shows this is true. (Hint: show that there are no exceptions to the stated rule.)
+
+##Set operations 
 
 SQL defines a set `UNION` operator that allows you to append one query's results to another. Suppose that you wanted to list all email addresses in the database.
 
@@ -683,6 +775,8 @@ mysql> select email from student
 ```
 
 When using `UNION`, the two queries must be **union compatible**: they must return the same number of columns, and the corresponding columns must have the same data type.
+
+MySQL also provides operators for set intersection (`INTERSECT`) and set difference (`MINUS`).
 
 # Contents
 
