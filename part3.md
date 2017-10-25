@@ -660,7 +660,7 @@ Because the subquery is on the same table as the main query, you must use an ali
 The `EXISTS` operator checks for the existence of records that satisfy criteria stated in the subquery. Suppose you wanted to find the sports that have athletes in the database.
 
 ```
-mysql> select distinct name, gender from sport where exists 
+mysql> select name, gender from sport where exists 
     -> (select * from student_sport where sport.name = student_sport.sport_name 
     -> and sport.gender = student_sport.gender);
 +----------+--------+
@@ -680,7 +680,7 @@ It is common to `SELECT *` in subqueries that follow `EXISTS` because it does no
 Both `IN` and `EXISTS` can be combined with `NOT`. For example, this reverses the logic of the previous query, listing sports that do not have any athletes in the database.
 
 ```
-mysql> select distinct name, gender from sport where not exists 
+mysql> select name, gender from sport where not exists 
     -> (select * from student_sport where sport.name = student_sport.sport_name 
     -> and sport.gender = student_sport.gender);
 +-----------------+--------+
@@ -747,7 +747,7 @@ Use the subquery operators introduced in this section to answer the following. W
 
 ##Set operations 
 
-SQL defines a set `UNION` operator that allows you to append one query's results to another. Suppose that you wanted to list all email addresses in the database.
+MySQL defines a set `UNION` operator that allows you to append one query's results to another. Suppose that you wanted to list all email addresses in the database.
 
 ```
 mysql> select email from student
@@ -776,7 +776,25 @@ mysql> select email from student
 
 When using `UNION`, the two queries must be **union compatible**: they must return the same number of columns, and the corresponding columns must have the same data type.
 
-MySQL also provides operators for set intersection (`INTERSECT`) and set difference (`MINUS`).
+Many SQL implementations define operators for set intersection (`INTERSECT`) and set difference (`MINUS`), but MySQL does not support these. Once again, these are "syntactic sugar," which means that they just provide another way to say something that can already be expressed in a different way. 
+
+|                  Union                   |               Intersection               |                Difference                |
+| :--------------------------------------: | :--------------------------------------: | :--------------------------------------: |
+| ![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Venn0111.svg/180px-Venn0111.svg.png) | ![](https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Venn0001.svg/180px-Venn0001.svg.png) | ![](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Venn0010.svg/180px-Venn0010.svg.png) |
+
+(Public domain images from Wikipedia.)
+
+### Exercise set 14
+
+1. Write a query that lists the emails of all students who are:
+   - in the Supported Learning Program, OR
+   - are athletes.
+2. Write a query that lists the emails of all students who are:
+   - in the Supported Learning Program, AND
+   - are athletes.
+3. Write a query that lists the emails of all students who are:
+   - in the Supported Learning Program, AND
+   - are NOT athletes.
 
 # Contents
 
