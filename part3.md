@@ -92,7 +92,7 @@ The `WHERE` clause filters the Cartesian product, keeping only the rows where th
 
 Most often, a join matches primary key values in one table with foreign key values in another. But a join can match any column values with the same underlying domain.
 
-The join syntax above is a good way to introduce joins, because you are already familiar with  `WHERE` clauses. Although this syntax is easier to grasp at first, you should use a newer, ANSI-standard syntax for joins. Here is the same query using ANSI join syntax.
+The join syntax above is a good way to introduce joins, because you are already familiar with `WHERE` clauses. Although this syntax is easier to grasp at first, you should use a newer, ANSI-standard syntax for joins. Here is the same query using ANSI join syntax.
 
 ```
 mysql> select student.email, visit2nf.email, academic_rank, location 
@@ -491,7 +491,7 @@ mysql> select email, count(*) from visit2nf group by email having count(*) > 1;
 
 This computes the number of visits for each email address, then displays only the counts that are greater than one.
 
-Like `WHERE`, the `HAVING` clause determines what data is displayed. The difference is that `WHERE` determines which rows *go into* the aggregate function, while `HAVING` determines which aggregate results are displayed. 
+Like `WHERE`, the `HAVING` clause filters data. The difference is that `WHERE` determines which rows *go into* the aggregate function, while `HAVING` determines which aggregate results are displayed. 
 
 ```
 mysql> select email, count(*) from visit2nf 
@@ -736,7 +736,7 @@ mysql> select location, cubicle, memory from computer a
 
 As is often the case, this is equivalent to a subquery that uses an aggregate function. Here, you would get the same results with `select location, cubicle, memory from computer where memory = (select min(memory) from computer);`.  
 
-###Exercise set 13 
+### Exercise set 13 
 
 Use the subquery operators introduced in this section to answer the following. Where possible, give other queries that would also return the correct results.
 
@@ -745,7 +745,7 @@ Use the subquery operators introduced in this section to answer the following. W
 3. Without using an aggregate function, write a query that returns the earliest visit check in time.
 4. All students in the database have at least one major listed, even if it is listed as "Undecided". Write a query that shows this is true. (Hint: show that there are no exceptions to the stated rule.)
 
-##Set operations 
+## Set operations 
 
 MySQL defines a set `UNION` operator that allows you to append one query's results to another. Suppose that you wanted to list all email addresses in the database.
 

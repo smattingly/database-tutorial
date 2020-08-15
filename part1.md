@@ -26,17 +26,21 @@ An operating system implements a file system to hide the details of lower level 
 
 A **Database Management System (DBMS)** is software that hides the details of file systems so that application software can store and retrieve data using even higher level abstractions. Hiding the details of the OS file system can improve the performance, security, and reliability of the data while allowing flexible multi-user remote access.
 
-The details of the data abstractions vary from one type of DBMS to another. Since the 1970s, the relational data model has dominated. More recently, object databases, "NoSQL" databases, and hybrid models have become popular.
+The details of the data abstractions vary from one type of DBMS to another. Early DBMS tools used data models based on hierarchies or "networks". From the early 1970s to about 2000, the relational data model dominated the field, and is still used very widely. More recently, data models based on objects, documents, graphs, etc. have also become popular, especially for Web development.
 
-This tutorial will focus on MySQL as an example of a relational DBMS. (Most of the content will transfer easily to other relational DBMSs like Microsoft SQL Server and Oracle.) A briefer look at the NoSQL models is also included.
+The first portion of this tutorial will focus on MySQL as an example of a relational DBMS. (Most of the content will transfer easily to other relational DBMSs like Microsoft SQL Server and Oracle.) The second portion will focus on MongoDB as an example of a "document" database.
 
 ## Relational databases
 
 The "relation" in relational databases refers to the (hopefully) familiar concept of a relation between sets. 
 
-A **set** is a collection of elements where no particular order is defined, and duplicate items are allowed. For example, $\lbrace Bob, Alice \rbrace$ is a set with two elements, and $\lbrace  Linux, iOS, Android, Windows \rbrace$ is a set with four elements.
+A **set** is a collection of elements where no particular order is defined, and duplicate items are not allowed. For example, $\lbrace Bob, Alice \rbrace$ is a set with two elements, and $\lbrace  Linux, iOS, Android, Windows \rbrace$ is a set with four elements.
 
-A **relation** is a mapping from one set to another. For example, suppose that the first set above represents some technology users, and the second set represents the operating systems that they might use. Then the following relation maps one set to the other, telling us who uses which operating system(s): $ \lbrace (Bob, Windows), (Bob, iOS), (Alice, Linux), (Alice, Android), (Alice, Windows) \rbrace$. In this context, the set of all users is called the relation's **domain**, and the set of all OSs is called the relation's **range**.
+A **relation** is a mapping from one set to another. For example, suppose that the first set above represents some technology users, and the second set represents the operating systems that they might use. Then the following relation maps one set to the other, telling us who uses which operating system(s):
+$$
+\lbrace (Bob, Windows), (Bob, iOS), (Alice, Linux), (Alice, Android), (Alice, Windows) \rbrace
+$$
+In this context, the set of all users is called the relation's **domain**, and the set of all OSs shown is called the relation's **range**. 
 
 There are various ways to describe a relation, but here it is given as a set of ordered pairs, where each pair represents a fact: Bob uses Windows, Bob uses iOS, Alice uses Linux, and so on. Database designers often rely on the **Closed World Assumption**, where any fact that is not recorded as true is assumed to be false. Under the Closed World Assumption, Bob does not use Linux and Alice does not use iOS.
 
@@ -101,28 +105,39 @@ A naïve approach to database design would create a table with one column for ea
 
 When you get to the heart of data definitions and manipulations, you can rely on (fairly) standard SQL. But to reach that point, you must start with some details that are specific to your DBMS, OS, and hosting environment.
 
-This tutorial assumes that an instructor has already provided you with: 
+This tutorial assumes that you are already set up with: 
 
-1. a default Ubuntu Linux workspace hosted on [Cloud9](https://www.c9.io/) where you can open a bash shell (terminal), and
-2. the initial version of the example MySQL database is already in place in your Cloud9 workspace.
+1. a running instance of the MySQL server (daemon), 
+2. an operating system where you can open a terminal (bash, PowerShell, etc.),
+3. the command line client software, `mysql`
 
-If that is not the case, see the appendix for help with setting up a work environment.
-
-### Starting the MySQL server
-
-In the terminal, type `mysql-ctl start`. This starts the MySQL server processes if they are not already running; if they are running they will be restarted. (Important note: this command is specific to the Cloud9 hosting environment. It will not work in a native Linux environment running MySQL. Also, in a production environment you should avoid needless restarts of a running database server.)
-
-You should see a message that indicates the server is started. You may also see a message about checking tables; this is a normal server maintenance task. The database server is now running in the background, waiting for clients to connect. You are returned to the bash prompt.
+If that is not the case, contact your instructor for help with setting up a work environment.
 
 ### Logging in with the `mysql` client
 
-At the bash prompt, type `mysql -u root`. This launches the standard terminal-based MySQL client program; it will connect to the running MySQL server, using `root` as the MySQL username. (Important note: in a production system, you should avoid running as root except when absolutely necessary, and of course the root account should at least have a strong password. Due to the nature of the Cloud9 workspaces, this tutorial neglects this critical security practice, but that is ***not*** a justification for neglecting it in a professional setting.)
+In your terminal, launch the `mysql` client.  
 
-In place of the operating system prompt, you should now see a `mysql>` prompt, which tells you that the client is waiting for your command.
+Depending on your configuration, you may need to supply a username and password by typing `mysql -u USERNAME -p`. The `-p` flag causes the client to prompt you for a password, which will not echo in any way as you type. The client will attempt to authenticate to the server with that password and the username you put after the `-u` flag.
+
+When you have successfully connected to the database server, your operating system's terminal prompt will be replaced with a `mysql>` prompt. The client is waiting for your command.
+
+### Creating the initial database
+
+If the example database has not already been created for you, type the following at the `mysql>` prompt:
+
+```sql
+source dbsetup.sql;
+```
+
+This assumes that the file `dbsetup.sql` exists in the folder where you launched the `mysql` client.
+
+The file contains SQL commands to create the example database and its starting contents.
+
+You are now ready to explore the MySQL installation as if you were a new employee learning the organization's systems.
 
 ### Finding and selecting a database
 
-A MySQL server hosts multiple databases. Each database is a named collection of tables and other things. Each database is a namespace. To list the databases that are present on the server, type `show databases;` and press Enter. You should see the following results.
+A MySQL server hosts multiple databases. Each database is a named collection of tables and other things. Each database is a namespace. To list the databases that are present on the server, type `show databases;` and press Enter. You should see something like the following results.
 
 ```
 mysql> show databases;
@@ -130,19 +145,17 @@ mysql> show databases;
 | Database           |
 +--------------------+
 | information_schema |
-| c9                 |
-| mysql              |
 | learning_center    |
 | performance_schema |
-| phpmyadmin         |
+| sys                |
 +--------------------+
-6 rows in set (0.03 sec)
+4 rows in set (0.03 sec)
 ```
 
 A couple of notes:
 
 - Commands end with a semicolon. If you press the Enter key without a final semicolon, you may see a continuation prompt `->`. The client is prompting you to continue with your command. If you have made an error and you want to get back to the `mysql>` prompt, just type a semicolon and press Enter.
-- Much like an OS prompt, you can use the up and down arrow keys to cycle through your previous queries. You can then edit them at the database prompt.
+- Much like an OS prompt, you can use the up and down arrow keys to cycle through your previous commands. You can then edit them at the database prompt.
 - SQL *commands* are not case-sensitive. `SHOW DATAbASeS;` will work fine. However, a few keywords and all user-defined identifiers (such as table and column names) *are* case-sensitive.
 
 At this point, you have not selected a database to use. You will use the `learning_center` database, so select it with the following command: `use learning_center;`. (This is much like using `cd` to change to a particular folder in the file system. Your current folder or database becomes the default namespace for files or table names that appear in your commands.)
@@ -153,7 +166,6 @@ By the way, the other databases listed above are automatically created by MySQL 
 
 Each time you sit down to work with MySQL, you will need to repeat the preceding steps to:
 
-1. (re)start the MySQL server,
 2. login with a MySQL client, and
 3. select the database that you want to work on.
 
@@ -206,11 +218,11 @@ Note that `describe` is a non-SQL command specific to the MySQL product; other D
 
 The first column of these results lists the 16 column names in the `visit` table. **Field** is another word for column, by the way.  The second column lists the datatype for each field. Most have a datatype of `VARCHAR`, which is character (textual) data. The maximum length of a value is specified in parentheses. `purpose_achieved` is a fixed-length one character field because it stores Y or N for Yes or No. Two of the fields store `TIMESTAMP` data, a date and time datatype with some special characteristics. 
 
-## Retrieving data
+## Retrieving data with SQL
 
 The `learning_center` database's `visit` table tracks student visits to Learning Center locations. It's time to take a look at the table's data contents.
 
-### All table contents
+### All table rows and columns
 
 The SQL `SELECT` statement reads or retrieves rows from database tables. This statement has many complex options, but the most basic form will show all rows and columns in a given table: `select * from <table_name>;`. 
 
@@ -224,7 +236,7 @@ But most of the time, you will work around the problem by selecting only the col
 
 The asterisk or "star" character in the previous SQL statement asks for all the table columns. Often, you do not need to see all the columns. You can ask for only the columns you need by listing them in the statement: `select <column_name> [ , <column_name> ... ] from <table_name>;`. The square brackets `[ ]` are not SQL; like the angle brackets, they are meta-characters that mark syntax options. The square brackets surround optional portions of statements. The ellipsis `...` means that the optional portion can be repeated.
 
-Remember that you can get a table's column names with the `DESCRIBE` command. So, you can list just the columns you need to see. The list must contain at least one column name, and it can contain more, which are separated by commas. For example, run the query below.
+Remember that you can get a table's column names with the `DESCRIBE` command. So, you can list just the columns you need to see. The list must contain at least one column name, and it can contain more, which are separated by commas. For example, run the **query** (database command) below.
 
 ```
 mysql> select first_name, last_name, check_in_time, check_out_time from visit;                                            
@@ -251,7 +263,7 @@ mysql> select first_name, last_name, check_in_time, check_out_time from visit;
 
 These results are much easier to read. They still include all 14 of the table's rows, but only the four columns that you listed. 
 
-Each result row represents a student's visit to a Learning Center location. For example, Gary Gatehouse arrived on August 30 at 2:35 p.m. Gary left at 3:53 p.m. The other details of the visit are not shown here; they are recorded in the other twelve columns that are not listed in the query.
+Each result row represents a student's visit to a Learning Center location. For example, Gary Gatehouse arrived on August 30 at 2:35 p.m. Gary left at 3:53 p.m. The other details of the visit are not shown here; they are recorded in the other twelve columns that are not listed by the query.
 
 Notice that Gary arrived for another visit on August 31 at almost the same time. The `NULL` entry in the `check_out_time` column means that Gary has not completed the check out process to record the end of his visit. Imagine that it is now the afternoon of August 31, some time after 2:36 p.m. Gary is still participating in his Learning Center activity. In fact it must be after 4:00 p.m., because Debra Davis arrived then; she also is still participating in some Learning Center activity. (Remember that check in and check out times are automatically captured by application software, not entered by users. So these time stamps must be accurate, barring incorrect hardware clocks or a security breach.)
 
@@ -500,7 +512,7 @@ This isn't really what you want. Nothing is missing, but some things are duplica
 You need something that takes the results, after any `WHERE` filter is applied, and excludes duplicates from the rows that met the `WHERE` condition. The `DISTINCT` keyword is what you need.
 
 ```
-mysql> select distinct first_name, last_name from visit order by last_name, first_name;                                  
+mysql> select distinct first_name, last_name from visit order by last_name, first_name;               
 +------------+-----------+
 | first_name | last_name |
 +------------+-----------+
@@ -552,7 +564,7 @@ Later, you will learn how an improved database design can help prevent them from
 
 ### Exercise set 1
 
-Write a query (a `SELECT` statement) that satisfies each of the following. Once you have the correct query, use the `tee` command to store your work to a file. For example, consider the first exercise. You should:
+Write a `SELECT` statement that satisfies each of the following. Once you have the correct query, use the `tee` command to store your work to a file. For example, consider the first exercise. You should:
 
 - figure out the correct query,
 - execute the MySQL command `tee exercise1-1.txt;` to begin capturing your session to a file named `exercise1-1.txt`,
@@ -568,7 +580,7 @@ Repeat this process for each exercise, using the filename `exercise1-2.txt` for 
 5. List all sports that appear in the `visit` table. Sort them alphabetically, and eliminate duplicate results. What problems do you see in this data?
 6. List all majors that appear in the `visit` table. Sort them alphabetically, and eliminate duplicate results. What problems do you see in this data?
 
-## Updating data
+## Updating data with SQL
 
 SQL's `UPDATE` statement allows you to modify the data in existing table rows. For example, correct one of the problems uncovered earlier with this statement.
 
@@ -594,7 +606,7 @@ Query OK, 1 row affected (0.04 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
-Now suppose that Learning Center staff report some problems involving the Web application. To address these, you will need to run updates that imitate the SQL statements embedded in the Web application' code.
+Now suppose that Learning Center staff report some problems involving the Web application. To address these, you will need to run updates that imitate the SQL statements embedded in the Web application's code.
 
 First, Learning Center staff report that Gary Gatehouse tried to check out at 3:15 p.m. on August 31, but was unable to because their network connection was down. Gary reported that he did meet his goals for the visit, and that he did not meet with a tutor.
 
@@ -640,7 +652,7 @@ This shows that the Gatehouse check in from August 31 now has a check out on the
 Here are a couple of points worth clarifying.
 
 - You did not need to do anything about tutoring in your update. Tutoring information defaults to `NULL`, and it stays that way unless the student provides specific tutoring data.
-- Complete timestamp values are in the format 'YYYY-MM-DD HH:MM:SS', where the letters represent digits for Year, Month, Day, Hour, Minute, and Second, respectively. The hours use 24-hour encoding. You do not have to provide a complete value, but you must start with year and continue without skipping any units. Zeroes will be used to complete the remaining units that you do not specify. That is why the check out time shown above is greater than the date alone; the date alone is expanded to have a time of all zeroes (midnight), and the check out timestamp is after midnight.
+- Complete timestamp values are in a modified [ISO 8601 format](https://www.iso.org/iso-8601-date-and-time-format.html): 'YYYY-MM-DD HH:MM:SS', where the letters represent digits for Year, Month, Day, Hour, Minute, and Second, respectively. The hours use 24-hour encoding. You do not have to provide a complete value, but you must start with year and continue without skipping any units. Zeroes will be used to complete the remaining units that you do not specify. That is why the check out time shown above is greater than the date alone; the date alone is expanded to have a time of all zeroes (midnight), and the check out timestamp is after midnight.
 
 Now suppose that Learning Center staff reported a problem with the system time. When the server was restarted right before the new semester, the system time was incorrect-- it was an hour ahead. Suppose that the server time has already been corrected, after business hours on August 30. This means that the timestamps for August 30 need to be updated to make them one hour earlier. The timestamps for August 31 are already correct.
 
@@ -709,7 +721,7 @@ Use the `tee <filename>;` and `notee;` commands to capture your solutions to the
 2. Using `UPDATE`s, clean up the majors information in the `visit` table. Try to make the values standard or consistent. Be sure that no information is lost.
 3. Using `UPDATE`s, clean up the sports information in the `visit` table. Try to make the values standard or consistent. Be sure that no information is lost. (Note: some sports names contain an apostrophe character that is identical to the single quotes enclosing text values. When you use these values in a statement, either escape the apostrophe with a backslash: `'Men\'s golf'`, or use double quotes to enclose the text value: `"Men's golf"`.)
 
-## Creating new data rows
+## Creating new rows with SQL
 
 Each time that a student checks in at a Learning Center location, a new row is created in the `visit` table.
 
@@ -737,7 +749,7 @@ mysql> select first_name, last_name, purpose, check_in_time, check_out_time from
 1 row in set (0.00 sec)
 ```
 
-Note that the value that you see for `check_in_time` will be different from the one shown above. It should be today's date, and the time should be correct except for the hour. (The discrepancy in the hour is because the Cloud9 hosting server is set for a different time zone. Don't worry about this now.)
+Note that the value that you see for `check_in_time` will be different from the one shown above. It should be today's date, and the time should match the time that you executed the `INSERT` statement. (Note that the time come's from the database server's clock, which may be set for a different time zone. Don't worry about this now.)
 
 Even though your `INSERT` provided no value for `check_in_time`, MySQL automatically stored the server's current time in that column of your new record. To understand why, you must look at the details of the `visit` table's definition.
 
@@ -781,6 +793,8 @@ mysql> insert into visit (first_name) values ('Alice');
 ERROR 1364 (HY000): Field 'last_name' doesn't have a default value
 ```
 
+Since the `INSERT` provided no last name, the field "tried" to default to `NULL`. But since the table definition says that is not allowed, you get an error. You must supply a last name.
+
 ### Exercise set 3
 
 Use the `tee <filename>;` and `notee;` commands to capture your solutions to the following exercises. Use the filename `exercise3-1.txt` for the first exercise, and so on.
@@ -789,7 +803,7 @@ Use the `tee <filename>;` and `notee;` commands to capture your solutions to the
 2. Insert a row for a brand new student, using any appropriate data you can imagine. Your statement must provide a value for every column except one: allow `check_in_time` to take on its default value. To verify your solution, execute a `SELECT` statement that returns only the newly inserted row.
 3. Repeat the previous exercise, using different data for another brand new student.
 
-## Deleting data 
+## Deleting data with SQL
 
 The SQL `DELETE` statement removes existing rows from a table.
 

@@ -21,8 +21,6 @@ So far, you have learned the basics of Creating, Reading, Updating, and Deleting
 Along the way, you dealt with some data problems related to the design of the `visit` table.
 
 - It is difficult to extract a definitive list of majors or sports.
-
-
 - One person entered her name in multiple different forms.
 - One person entered his email address correctly for one visit, and incorrectly for another.
 
@@ -134,7 +132,7 @@ Some tables have more than one candidate key, though this one does not. One cand
 
 The last line in the `CREATE TABLE` statement above defines a `PRIMARY KEY` constraint. This tells the DBMS which set of columns have been selected as the primary key. Based on this constraint, the DBMS enforces certain rules.
 
-- Primary key columns must not be `NULL`. The DBMS will reject data containing `NULL` for any primary key column. Each `sport` row must have a non-null value for `name` and `gender`.
+- Primary key columns must not be `NULL`. The DBMS will reject data containing `NULL` for any primary key column. Each `sport` row must have non-null values for `name` and `gender`.
 - Primary key values must be unique. The DBMS will reject operations that would result in multiple rows with the same values in primary key columns. The `sport` table can have only one row with $\lbrace$`name`, `gender`$\rbrace$ containing $\lbrace$'Basketball', 'Men'$\rbrace$.
 
 These rules ensure **entity integrity**: you can always identify the unique **entity** (or "thing") that the row's facts are about.
@@ -763,10 +761,24 @@ Where relevant, use the `tee <filename>;` and `notee;` commands to capture your 
    - Use `ALTER TABLE <table name> DROP COLUMN <column name>;` to remove the problematic dependency.
    - Create and populate a new table named `printer`, with appropriate column(s) and primary key.
    - What additional change should you make to the modified `computer` table? (Hint: referential integrity)
+   
 2. Are the modified `computer` table and the new `printer` table in BCNF? Explain.
+
 3. Decompose the `staff` table to satisfy BCNF. The process is similar to the first exercise above. The new table is named `location`, and has two columns: `name`, and `assistant` which respectively hold the name of the location and the staff assistant who is located there.
+
 4. Explain why each of the following tables is, or is not, in 3NF. `visit2nf`, `student`,  `sport` , `major`, `student_sport`, `student_major`.
+
 5. Explain why each of the following tables is, or is not, in BCNF. `visit2nf`, `student`,  `sport` , `major`, `student_sport`, `student_major`, `computer`, `printer`.
+
+6. Organizations sometimes classify their information systems-- and their associated databases-- as follows.
+
+   - Transaction Processing Systems: store and process sales or similar "basic" transactions. "Who bought what today?"
+
+   - Management Information Systems: summarize and analyze transaction data to support shorter-term tactical decision making by middle managers. "How much did we sell this week vs. last week Should we adjust pricing?"
+
+   - Executive Information Systems, aka Decision Support Systems: may use summarized transaction data, along with forecasts, simulations, and other open-ended investigations to support longer-term strategic decision making by executives. "What products should discontinue? What new products should we introduce?"
+
+     High levels of normalization are most appropriate for which of these levels? Is a low level of normalization appropriate for any of these levels?
 
 # Contents
 

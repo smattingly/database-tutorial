@@ -88,11 +88,13 @@ The database designer's viewpoint, usually implemented as tables, is called the 
 
 Finally, there is the **physical schema**. This is the viewpoint of the database administrator, in the most specialized sense of the term. The details of this level are typically hidden by the abstractions of the DBMS, and are beyond the scope of this tutorial. They deal with how the data is physically stored, evaluating tradeoffs that arise from the characteristics of alternative [storage engines](https://en.wikipedia.org/wiki/storage_engine) ([MySQL supports several](https://dev.mysql.com/doc/refman/5.7/en/storage-engine-setting.html)), [OS file systems](https://en.wikipedia.org/wiki/File_system#File_systems_and_operating_systems), [storage devices](https://en.wikipedia.org/wiki/Computer_data_storage#Characteristics_of_storage), and so forth. This requires a highly specialized skill set, with much of it specific to one DBMS product.
 
-###Views as security technique
+### Views as security technique
 
 In some situations, views provide a security benefit, too. You can give a MySQL user account permissions to access data through a view, while denying permissions to see or modify data in the underlying tables.
 
 Suppose that some database users only need to deal with data related to student athletes. Following the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege), you could restrict their access as follows.
+
+(This section assumes that you are using the MySQL `root` account or another account with sufficient privileges. Depending on your MySQL environment, some of the details could vary.)
 
 First, create views for access to the needed data. 
 
@@ -153,7 +155,7 @@ The `exit` command signs you out of the `mysql` client and returns you to the op
 
 When you have signed in with the new account, a `show databases;` command shows very little because the new account has few permissions.
 
-To change this, sign out from the `athletics_user` account, and sign in as `root` again. (Alternatively, you can open two terminals and two MySQL sessions, one with each account.)
+To change this, sign out from the `athletics_user` account, and sign in as you normally do. (Alternatively, you can open two terminals and two MySQL sessions, one with each account.)
 
 ```
 mysql> -- who am I?
@@ -229,7 +231,7 @@ ERROR 1142 (42000): UPDATE command denied to user 'athletics_user'@'localhost' f
 
 Consistent with the granted permissions, the new user can `SELECT` data from two views, but not from other views or tables. In addition, the user cannot `UPDATE`, `DELETE`, or `INSERT` on the views that they can see; only `SELECT` permission was granted.
 
-###Modifying view contents is problematic
+### Modifying view contents is problematic
 
 Even when a user has permissions to modify a view, some modifications lead to difficulties.
 
@@ -274,7 +276,7 @@ The bottom line is that modifying data through views should be performed with gr
 
 ### Exercise set 15
 
-1. Following the athletics example above, create one or more views for users who are only concerned with  commuter students.
+1. Following the athletics example above, create one or more views for users who are only concerned with commuter students.
 2. Create a MySQL account with username `commuter`  and password `more parking`. Set permissions so that this account can retrieve but not modify contents of the views from the previous exercise.
 
 ## Indexes
@@ -390,7 +392,7 @@ Note that these commands can lock database table so that they are read-only or c
 
 ## Data integrity
 
-###Transactions
+### Transactions
 
 Entity and referential integrity go a long way toward ensuring the integrity of database contents. 
 
@@ -476,7 +478,7 @@ mysql> -- Now no one sees the effect of either of the deletes.
 
 There is a third alternative. If a user starts a transaction and terminates their session without an explicit commit, the DBMS will rollback the transaction. This ensures the results are "all or nothing". 
 
-###Backup and restore
+### Backup and restore
 
 A DBMS like MySQL uses many files to store the contents of multiple databases, tables, indexes, and other database objects. These files may be spread across different storage devices, and even different servers.
 
@@ -487,12 +489,12 @@ For these and other reasons, you cannot backup data for DBMSs like MySQL by copy
 In general, you must use special tools to backup and restore DBMS data. MySQL provides a program named `mysqldump`. (This is not a command that runs within the `mysql` client; it is an executable program that is launched from an OS command prompt.)
 
 ```bash
-mysqldump -u root -p learning_center > backup.sql
+mysqldump learning_center > backup.sql
 ```
 
-This tells the backup tool to connect to the local server using the `root` account. It will prompt for a password (`-p`); for a c9 installation just press Enter, because the root password is blank. The command shown above will dump the `learning_center` database to a file named `backup.sql`.
+This tells the backup tool to dump the `learning_center` database to a file named `backup.sql`. (In many cases you will need to provide a username and password, using the same `-u` and `-p` flags that you do for the `mysql` client.)
 
-The `mysql` client is used to restore a backup.
+To restore a backup, use the `mysql` client in batch mode-- not the interactive mode that you normally use. (Again, a username and password will usually be needed.)
 
 ```bash
 mysql -u root -p learning_center < backup.sql
