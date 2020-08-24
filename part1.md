@@ -713,11 +713,11 @@ Rows matched: 9  Changed: 9  Warnings: 0
 
 Use the `tee <filename>;` and `notee;` commands to capture your solutions to the following exercises. Use the filename `exercise2-1.txt` for the first exercise, and so on.
 
-1. All of the students are "moving up" in academic rank. You will need to use multiple `UPDATE` statements, and plan them carefully. Update the data so that: 
-   - current freshmen become sophomores, 
-   - current sophomores become juniors, 
-   - current juniors become seniors, and
-   - current seniors remain unchanged.
+1. All of the students are "moving up" in academic rank. You will need to use multiple `UPDATE` statements, and *plan them carefully*. When you are finished: 
+   - the current freshmen should be sophomores, 
+   - the current sophomores should be juniors, 
+   - the current juniors should be seniors, and
+   - the current seniors should remain unchanged.
 2. Using `UPDATE`s, clean up the majors information in the `visit` table. Try to make the values standard or consistent. Be sure that no information is lost.
 3. Using `UPDATE`s, clean up the sports information in the `visit` table. Try to make the values standard or consistent. Be sure that no information is lost. (Note: some sports names contain an apostrophe character that is identical to the single quotes enclosing text values. When you use these values in a statement, either escape the apostrophe with a backslash: `'Men\'s golf'`, or use double quotes to enclose the text value: `"Men's golf"`.)
 
@@ -822,8 +822,8 @@ Notice that you do not (cannot) list column names, because `DELETE` works on ent
 
 Use the `tee <filename>;` and `notee;` commands to capture your solutions to the following exercises. Use the filename `exercise4-1.txt` for the first exercise, and so on.
 
-1. In the previous set of exercises, you inserted a new visit row. Delete it. To verify your solution, execute a `SELECT` statement that shows the row is no longer present.
-2. In the previous set of exercises, you inserted two new student rows. Use a single `DELETE` statement to delete both rows. To verify your solution, execute a `SELECT` statement that shows the rows are no longer present.
+1. In the previous set of exercises, you inserted a new visit row for Bob Booth. Delete it. To verify your solution, execute a `SELECT` statement that shows the row is no longer present.
+2. In the previous set of exercises, you inserted two visit rows, using brand new student information. Use a single `DELETE` statement to delete both rows. To verify your solution, execute a `SELECT` statement that shows the rows are no longer present.
 
 
 
