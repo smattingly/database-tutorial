@@ -718,8 +718,8 @@ Use the `tee <filename>;` and `notee;` commands to capture your solutions to the
    - the current sophomores should be juniors, 
    - the current juniors should be seniors, and
    - the current seniors should remain unchanged.
-2. Using `UPDATE`s, clean up the majors information in the `visit` table. Try to make the values standard or consistent. Be sure that no information is lost.
-3. Using `UPDATE`s, clean up the sports information in the `visit` table. Try to make the values standard or consistent. Be sure that no information is lost. (Note: some sports names contain an apostrophe character that is identical to the single quotes enclosing text values. When you use these values in a statement, either escape the apostrophe with a backslash: `'Men\'s golf'`, or use double quotes to enclose the text value: `"Men's golf"`.)
+2. Using `UPDATE`s, clean up the majors information in the `visit` table. Make the values standard or consistent by spelling out all words, using commas to separate multiple majors, and listing multiple majors in alphabetical order.
+3. Using `UPDATE`s, clean up the sports information in the `visit` table. Make the values standard or consistent by spelling out all words, using commas to separate multiple majors, and listing multiple majors in alphabetical order. (Note: some sports names contain an apostrophe character that is identical to the single quotes enclosing text values. When you use these values in a statement, either escape the apostrophe with a backslash: `'Men\'s golf'`, or use double quotes to enclose the text value: `"Men's golf"`.)
 
 ## Creating new rows with SQL
 
