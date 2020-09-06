@@ -462,7 +462,9 @@ Without any of these temporal qualifiers, it is inconsistent to have rows that l
 
 #### Exercise set 6
 
-1. In a text file named `exercise6-1.txt`, list every functional dependency in the database.
+1. In a text file named `exercise6-1.txt`, list all non-trivial functional dependencies in the `visit1nf` table.
+2. In a text file named `exercise6-2.txt`, list all non-trivial functional dependencies in the `sport` table.
+3. In a text file named `exercise6-3.txt`, list all non-trivial functional dependencies in the `major` table.
 
 ### Second normal form
 
@@ -526,7 +528,7 @@ Earlier, you defined $\lbrace$`email`, `check_in_time`$\rbrace$ to be the primar
 
 So, 2NF asks if any non-key columns are dependent on a proper subset of the key $\lbrace$`email`, `check_in_time`$\rbrace$. 
 
-Yes. $\lbrace$`email`$\rbrace$ determines the non-key columns `first_name`, `last_name`, `academic_rank`, `slp_instructor_first_name`, and `slp_instructor_last_name`. 
+Yes. $\lbrace$`email`$\rbrace$ determines the non-key columns `first_name`, `last_name`, `academic_rank`, `residential_status`,`slp_instructor_first_name`, and `slp_instructor_last_name`. 
 
 Conclusion: `visit1nf` does not satisfy 2NF. 
 
@@ -534,7 +536,7 @@ The dependencies on $\lbrace$`email`$\rbrace$ are called **partial dependencies*
 
 To normalize the design to 2NF, you must decompose `visit1nf` into two tables. Each subset of `visit1nf`'s primary key that was a determinant will become the primary key of a new table. 
 
-- The first is a new table named `student`. Its key will be $\lbrace$`email`$\rbrace$, and it will contain all the columns from `visit1nf` that are dependent on `email` alone.
+- The first is a new table named `student`. Its primary key will be $\lbrace$`email`$\rbrace$, and it will contain all the columns from `visit1nf` that are dependent on `email` alone.
 - The second will be a modified replacement for `visit1nf` called `visit2nf`. Its key will still be $\lbrace$`email`, `check_in_time`$\rbrace$, but it will no longer have the columns that are dependent on `email` alone.
 
 This makes sense intuitively. It's pretty clear that `visit1nf` is "mixing apples and oranges". It contains facts about two distinct kinds of thing, or two different entities: visits and students.
@@ -594,7 +596,7 @@ There are other possible actions for referential integrity enforcement besides r
 
 Both `student` and `visit2nf` satisfy second normal form, because:
 
-1. they are in 1NF (all single values), and
+1. they are in 1NF (all atomic values), and
 2. no non-key columns are determined by a proper subset of any candidate key.
 
 This design, along with enforcement of entity and referential integrity, prevents many types of data anomalies.
