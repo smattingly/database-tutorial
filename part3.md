@@ -1,6 +1,6 @@
 # Databases in Context: A Just-in-Time Tutorial, Part 3
 
-[Steve Mattingly](https://www.linkedin.com/in/steve-mattingly-aab8064a), Assistant Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu).
+[Steve Mattingly](https://www.linkedin.com/in/steve-mattingly), Associate Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu/).
 
 *Databases in Context: A Just-in-Time Tutorial* by Stephen S. Mattingly is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/). ![Creative Commons Attribution-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-sa/4.0/80x15.png)
 
@@ -53,7 +53,7 @@ mysql> select student.email, visit2nf.email, academic_rank, location from studen
 126 rows in set (0.00 sec)
 ```
 
-By listing multiple tables in the `FROM` clause, you generate the **Cartesian product** of the tables. The `student` table contains 9 rows, and the `visit2nf` table contains 14 rows. Their Cartesian product contains 9 times 14, or 126 rows. Each result row is a single `student` row combined with a single `visit2nf` row, and there is one result row for every possible combination.
+By listing multiple tables in the `FROM` clause, you generate the **Cartesian product** of the tables. The `student` table contains 9 rows, and the `visit2nf` table contains 14 rows. Their Cartesian product contains $9 \times 14 = 126 $ rows. Each result row is a single `student` row combined with a single `visit2nf` row, and there is one result row for every possible combination.
 
 What do these results represent? *Absolutely nothing meaningful.* It's as if you blindly shuffled the two tables together. This illustrates an important point: you can combine data in ways that make no sense. Just because a query is valid SQL, that doesn't mean it produces meaningful data. 
 
@@ -800,4 +800,4 @@ Many SQL implementations define operators for set intersection (`INTERSECT`) and
 
 [TOC]
 
-<!-- After using Typora to export HTML, manually fix the top-of-page link to this contents section, and also the page <title>. -->
+<!-- After using Typora to export HTML, use vi or Notepad (not VS Code) to fix the top-of-page link to this contents section, and also the page <title>. -->

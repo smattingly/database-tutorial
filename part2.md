@@ -1,6 +1,6 @@
 # Databases in Context: A Just-in-Time Tutorial, Part 2
 
-[Steve Mattingly](https://www.linkedin.com/in/steve-mattingly-aab8064a), Assistant Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu).
+[Steve Mattingly](https://www.linkedin.com/in/steve-mattingly), Associate Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu/).
 
 *Databases in Context: A Just-in-Time Tutorial* by Stephen S. Mattingly is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/). ![Creative Commons Attribution-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-sa/4.0/80x15.png)
 
@@ -737,7 +737,7 @@ mysql> select * from staff;
 
 If you think that $\lbrace$`assistant_email`$\rbrace$ determines $\lbrace$`location`$\rbrace$ then you are on the right track.
 
-However, it would be better to turn this around and say that $\lbrace$`location`$\rbrace$ determines  $\lbrace$`assistant_email`$\rbrace$. This fits with common sense: often a person's professional assistant is assigned based on common location. For this discussion, assume that is a business rule, and the dependency will always hold.
+However, it would be better to turn this around to say that $\lbrace$`location`$\rbrace$ determines  $\lbrace$`assistant_email`$\rbrace$. This fits with common sense: often a person's professional assistant is assigned based on common location. For this discussion, assume that is a business rule, and the dependency will always hold.
 
 Since $\lbrace$`location`$\rbrace$ is a determinant that is not a candidate key for the `staff` table, the table is not in BCNF.
 
@@ -774,16 +774,16 @@ Where relevant, use the `tee <filename>;` and `notee;` commands to capture your 
 
 6. Organizations sometimes classify their information systems-- and their associated databases-- as follows.
 
-   - Transaction Processing Systems: store and process sales or similar "basic" transactions. "Who bought what today?"
+   - *Transaction Processing Systems* store and process sales or similar "basic" transactions. "Who bought what today?"
 
-   - Management Information Systems: summarize and analyze transaction data to support shorter-term tactical decision making by middle managers. "How much did we sell this week vs. last week Should we adjust pricing?"
+   - *Management Information Systems* summarize and analyze transaction data to support shorter-term tactical decision making by middle managers. "How much did we sell this week vs. last week? Should we adjust pricing?"
 
-   - Executive Information Systems, aka Decision Support Systems: may use summarized transaction data, along with forecasts, simulations, and other open-ended investigations to support longer-term strategic decision making by executives. "What products should discontinue? What new products should we introduce?"
+   - *Executive Information Systems*, aka *Decision Support Systems* use summarized transaction data, along with forecasts, simulations, and/or other open-ended investigations to support longer-term strategic decision making by executives. "What products should we discontinue? What new products should we introduce?"
 
-     High levels of normalization are most appropriate for which of these levels? Is a low level of normalization appropriate for any of these levels?
+   High levels of normalization are most appropriate for which of these categories? Is a low level of normalization appropriate for any of these categories? Explain.
 
 # Contents
 
 [TOC]
 
-<!-- After using Typora to export HTML, manually fix the top-of-page link to this contents section, and also the page <title>. -->
+<!-- After using Typora to export HTML, use vi or Notepad (not VS Code) to fix the top-of-page link to this contents section, and also the page <title>. -->

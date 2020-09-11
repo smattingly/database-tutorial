@@ -1,6 +1,6 @@
 # Databases in Context: A Just-in-Time Tutorial, Part 5
 
-[Steve Mattingly](https://www.linkedin.com/in/steve-mattingly-aab8064a), Assistant Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu).
+[Steve Mattingly](https://www.linkedin.com/in/steve-mattingly), Associate Professor of Computer Science, [Davis & Elkins College](https://www.dewv.edu/).
 
 *Databases in Context: A Just-in-Time Tutorial* by Stephen S. Mattingly is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/). ![Creative Commons Attribution-ShareAlike 4.0 International License](https://i.creativecommons.org/l/by-sa/4.0/80x15.png)
 
@@ -146,4 +146,4 @@ However, an ORB can also make it possible to move from a relational DBMS to a DB
 
 [TOC]
 
-<!-- After using Typora to export HTML, manually fix the top-of-page link to this contents section, and also the page <title>. -->
+<!-- After using Typora to export HTML, use vi or Notepad (not VS Code) to fix the top-of-page link to this contents section, and also the page <title>. -->
