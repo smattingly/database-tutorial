@@ -180,7 +180,7 @@ mysql> insert into major(name) values
     -> ('Hospitality Management'),
     -> ('Management'),
     -> ('Marketing'),
-    -> ('Mathematics'),
+    -> ('Math'),
     -> ('Music'),
     -> ('Nursing'),
     -> ('Philosophy'),
@@ -581,7 +581,7 @@ Query OK, 0 rows affected (0.15 sec)
 
 The primary key of $\lbrace$`email`, `check_in_time`$\rbrace$ tells the DBMS to enforce entity integrity for visits.
 
-A **foreign key** is a set of columns that contains values drawn from the same domain as a different table's primary key. This is a way of "linking" rows in different tables. The `FOREIGN KEY` constraint tells the DBMS that `email` column values in this table refer to `email` column values in the `student` table. In other words, both columns have the same set of possible values (the same domain). This allows the DBMS to enforce **referential integrity** by ensuring that, for every `email` value that appears in `visit2nf`, there is a `student` table row with the same value in its `email` column. This has several implications.
+A **foreign key** is a set of columns that contains values drawn from the same domain as a different table's primary key. This is a way of "linking" rows in different tables. The `FOREIGN KEY` constraint tells the DBMS that `email` column values in this table refer to `email` column values in the `student` table. In other words, both columns have the same set of possible values (the same domain). This tells the DBMS to enforce **referential integrity** by ensuring that, for every `email` value that appears in `visit2nf`, there is a `student` table row with the same value in its `email` column. This has several implications.
 
 - MySQL will reject attempts to `INSERT` a `visit2nf` row with an `email` address that does not appear in the `student` table. In other words, a student's information must be in the database first, and then they can log visits. This ensures that a "link" or reference to an existing student is present when the visit is logged.
 - MySQL will reject attempts to `UPDATE` `student` table `email` values when there are `visit2nf` rows containing the same `email` values. This prevents breaking the reference by changing data.
@@ -601,13 +601,11 @@ Both `student` and `visit2nf` satisfy second normal form, because:
 
 This design, along with enforcement of entity and referential integrity, prevents many types of data anomalies.
 
-For complete referential integrity, you should add appropriate foreign keys to existing tables using the `ALTER TABLE` statement. 
+To enforce referential integrity on existing tables, you can use the `ALTER TABLE` statement to add foreign key constraints. 
 
 ```
 mysql> alter table student_sport
-    -> add constraint foreign key(email) references student(email);
-Query OK, 6 rows affected (0.06 sec)
-Records: 6  Duplicates: 0  Warnings: 0
+    -> add constraint foreign key(sport_name, gender) references sport(name, gender);
 ```
 
 #### Exercise set 7
@@ -620,7 +618,7 @@ Where relevant, use the `tee <filename>;` and `notee;` commands to capture your 
 4. There is a problem with the specific example given for the `SET TO NULL` referential integrity option above. What is it?
 5. An experienced database professional needs only a glance at `student`'s `CREATE TABLE` statement to know that it must be 2NF (as long as it contains no multi-valued entries). Why is that?
 6. Write and execute one or more statements that are rejected by the enforcement of referential integrity. 
-7. Following the `ALTER TABLE` example, modify the `student_sport` and `student_major` tables by adding appropriate foreign key constraints. 
+7. Use `ALTER TABLE` to add a second appropriate foreign key constraint to the `student_sport`. Then add the two appropriate foreign keys to `student_major`.
 8. Explain why each of the following tables is, or is not, in 2NF. `sport`, `student_sport`,  `major`,`student_major`. 
 
 ### Third normal form and Boyce-Codd normal form
