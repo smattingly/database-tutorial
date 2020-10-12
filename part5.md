@@ -26,13 +26,61 @@ The second DBMS covered in this tutorial is classified as a **document database*
 
 To transition from relational model thinking to document model thinking, begin by considering the humble .CSV file.
 
-TBD show CSV of relational table.
+```
+"email","sport_name","gender"
+"bbooth@dewv.net","Golf","Men"
+"ccadillac@dewv.net","Baseball","Men"
+"ccadillac@dewv.net","Soccer","Men"
+"ddavis@dewv.net","Soccer","Women"
+"ddavis@dewv.net","Softball","Women"
+"eelkins@dewv.net","Baseball","Men"
+```
 
 Comma-separated values (.CSV) files might be called the "least common denominator" of data formats. They are plain ASCII text files, which means that they can be read by nearly any software on any computing platform. They capture data in a tabular format: the first line typically gives "column" names, separated by commas. Each remaining line is one table "row", with commas separating the column values. Often, quotation marks will be used to enclose the values, which makes it safe for the fields to contain internal comma characters.
 
 The explosion of the Web and its documents (or pages) built with Hypertext Markup Language (HTML) inspired lots of other work with markup languages. In particular, eXtensible Markup Language (XML) is a format that replaces CSV in many Web-oriented settings. XML fits the "Web way" of doing things, and provides some advantages over CSV.
 
-TBD show same data as XML
+```xml
+<?xml version="1.0"?>
+
+<resultset statement="select * from learning_center.student_sport" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <row>
+        <field name="email">ccadillac@dewv.net</field>
+        <field name="sport_name">Baseball</field>
+        <field name="gender">Men</field>
+  </row>
+
+  <row>
+        <field name="email">eelkins@dewv.net</field>
+        <field name="sport_name">Baseball</field>
+        <field name="gender">Men</field>
+  </row>
+
+  <row>
+        <field name="email">bbooth@dewv.net</field>
+        <field name="sport_name">Golf</field>
+        <field name="gender">Men</field>
+  </row>
+
+  <row>
+        <field name="email">ccadillac@dewv.net</field>
+        <field name="sport_name">Soccer</field>
+        <field name="gender">Men</field>
+  </row>
+
+  <row>
+        <field name="email">ddavis@dewv.net</field>
+        <field name="sport_name">Soccer</field>
+        <field name="gender">Women</field>
+  </row>
+
+  <row>
+        <field name="email">ddavis@dewv.net</field>
+        <field name="sport_name">Softball</field>
+        <field name="gender">Women</field>
+  </row>
+</resultset>
+```
 
 XML is the basis for many document-oriented database tools, though not the one that you will study.
 
@@ -63,7 +111,39 @@ This is not a JavaScript tutorial, but these concepts are relevant to the docume
 
 Probably because of a data format called JSON. Pronounced "Jason", it stands for JavaScript Object Notation. Just as HTML Web work inspired the XML data format, JavaScript Web work inspired the JSON data format.
 
-TBD show same data in JSON.
+```json
+[
+    {
+        "email": "ccadillac@dewv.net", 
+     	"gender": "Men", 
+     	"sport_name": "Baseball"}, 
+    {
+        "email": "eelkins@dewv.net", 
+        "gender": "Men", 
+        "sport_name": "Baseball"
+    }, 
+    {
+        "email": "bbooth@dewv.net", 
+        "gender": "Men", 
+        "sport_name": "Golf"
+    }, 
+    {
+        "email": "ccadillac@dewv.net", 
+        "gender": "Men", 
+        "sport_name": "Soccer"
+    }, 
+    {
+        "email": "ddavis@dewv.net", 
+        "gender": "Women", 
+        "sport_name": "Soccer"
+    }, 
+    {
+        "email": "ddavis@dewv.net", 
+        "gender": "Women", 
+        "sport_name": "Softball"
+    }
+]
+```
 
 The text above is essentially valid JavaScript code. It is not a statement, because it does not "do" anything; it is an expression because it defines a value. If a JavaScript program read that text from a file, it would have one long text string. But JavaScript provides easy ways to "parse" that string so that it is transformed into real JavaScript objects with named properties and associated values. It is also easy to go the other direction: "serializing" runtime JavaScript objects into a JSON-format string that is just text-- easy to write to a file or send across a network.
 
@@ -117,12 +197,12 @@ When you have open, unmatched grouping symbols (parenthesis, braces, brackets), 
 
 ```
 > db.students.insertOne({
-...		_id: 'ggatehouse',
+...		_id: 1,
 ...     first_name: 'Gary', 
 ...     last_name: 'Gatehouse', 
 ...     email: 'ggatehouse@dewv.net', 
 ...     academic_rank: 'Sophomore', 
-...     residential_stats: 'On campus', 
+...     residential_status: 'On campus', 
 ...     majors: ['Math', 'Computer Science'], 
 ...     slp_instructor_first_name: 'Terry', 
 ...     slp_instructor_last_name: 'Tutor'
@@ -132,14 +212,14 @@ When you have open, unmatched grouping symbols (parenthesis, braces, brackets), 
 The response should be:
 
 ```
-{ "acknowledged" : true, "insertedId" : "ggatehouse" }
+{ "acknowledged" : true, "insertedId" : 1 }
 ```
 
 The preceding command inserted one document into the current database, in a collection named `students`.
 
 A MongoDB **collection** is a named group of documents. Since the `students` collection did not already exist, it was created. 
 
-The inserted document is a JSON-format object literal that contains eight fields representing Gary's student information, plus a field `_id` with value of `ggatehouse`. Every MongoDB document has an `_id` field, with a value that is unique to its collection. It acts as a primary key, and the value cannot be changed. If you do not provide an `_id` value when creating the document, MongoDB will automatically generate one. However, those ID values are hard to type and arbitrary (you would get different results than examples shown to you.) Often, simple MongoDB examples will just use sequential numbers. Here, you will use student usernames for `_id` values (the first part of their email addresses). That may not be a great design decision for a production database, but will be convenient for learning.
+The inserted document is a JSON-format object literal that contains eight fields representing Gary's student information, plus a field `_id` with value of 1. Every MongoDB document has an `_id` field, with a value that is unique to its collection. It acts as a primary key, and the value cannot be changed. If you do not provide an `_id` value when creating the document, MongoDB will automatically generate one. However, those ID values are hard to type and arbitrary (you would get different results than examples shown to you.) Often, simple MongoDB examples will just use sequential numbers. 
 
 Look at the information on Gary's majors. Where all the other values are quoted strings, the `majors` value is an array of quoted strings. In JSON, square brackets `[ ]` are used to group an array of comma-separated values. This is one way that MongoDB can model a one-to-many relationship: one student has multiple majors.
 
@@ -156,7 +236,16 @@ The following command uses array syntax in a different way to insert multiple do
 ...             academic_rank: 'Junior', 
 ...             residential_status: 'Off campus', 
 ...             majors: ['English'], 
-...             sports: ['Men\'s soccer', 'Baseball'], 
+...             sports: [
+...                 { 
+...                     name: 'Soccer', 
+...                     gender: 'Men'
+...                 },
+...                 {
+...                     name: 'Baseball',
+...                     gender: 'Men'
+...                 }
+...             ], 
 ...             slp_instructor_first_name: 'Terry', 
 ...             slp_instructor_last_name: 'Tutor'
 ...         },
@@ -165,7 +254,7 @@ The following command uses array syntax in a different way to insert multiple do
 ...             first_name: 'Irving', 
 ...             last_name: 'Icehouse', 
 ...             email: 'iicehouse@dewv.net', 
-...             class_rank: 'Sophomore', 
+...             academic_rank: 'Sophomore', 
 ...             residential_status: 'On campus', 
 ...             majors: ['Chemistry'], 
 ...             slp_instructor_last_name: 'Sam', 
@@ -178,23 +267,25 @@ The following command uses array syntax in a different way to insert multiple do
 The response should be:
 
 ```
-{ "acknowledged" : true, "insertedIds" : ["ccadillac", "iicehouse"] }
+{ "acknowledged" : true, "insertedIds" : [ 2, 3 ] }
 ```
 
 Where the `insertOne()` command processed a single object enclosed with `{ }`, the `insertMany()` command processes an array enclosed with `[ ]`. The elements of the array are separated by commas; each is an object enclosed with `{ }`.
 
+Notice that one student may play many sports, so the `sport` field is an array (if it is present). Each array item is a (sub-)document with fields of its own. If a student plays no sports, then the `sport` field will not be present for that student document; this is the equivalent of a `NULL` in a relational database.
+
 You can retrieve all the documents that you have inserted like this. 
 
 ```
-> db.student.find({})
+> db.students.find({})
 ```
 
 The empty braces `{ }` define an object that acts as a filter on the query. Since the filter object is empty, all documents will be returned.
 
 ```
-{ "_id" : "ggatehouse", "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_stats" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
-{ "_id" : "ccadillac", "first_name" : "Charlie", "last_name" : "Cadillac", "email" : "ccadillac@dewv.net", "academic_rank" : "Junior", "residential_status" : "Off campus", "majors" : [ "English" ], "sports" : [ "Men's soccer", "Baseball" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
-{ "_id" : "iicehouse", "first_name" : "Irving", "last_name" : "Icehouse", "email" : "iicehouse@dewv.net", "class_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Chemistry" ], "slp_instructor_last_name" : "Studybuddy" }
+{ "_id" : 1, "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 2, "first_name" : "Charlie", "last_name" : "Cadillac", "email" : "ccadillac@dewv.net", "academic_rank" : "Junior", "residential_status" : "Off campus", "majors" : [ "English" ], "sports" : [ { "name" : "Soccer", "gender" : "Men" }, { "name" : "Baseball", "gender" : "Men" } ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 3, "first_name" : "Irving", "last_name" : "Icehouse", "email" : "iicehouse@dewv.net", "academic_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Chemistry" ], "slp_instructor_last_name" : "Studybuddy" }
 ```
 
 You can count the number of documents in the collection as follows.
@@ -206,9 +297,15 @@ You can count the number of documents in the collection as follows.
 
 ### Exercise set 20
 
-MongoDB does not have a convenient way to selectively write shell contents to a file. You will need to copy and paste your work for the following exercises using a text editor. Be sure to copy both the MongoDB command(s) and the results that are returned. Use the filename `exerciseTBD-1.txt` for the first exercise, and so on.
+MongoDB does not have a convenient way to selectively write shell contents to a file. You will need to copy and paste your work for the following exercises using a text editor. Be sure to copy both the MongoDB command(s) and the results that are returned. Use the filename `exercise20-1.txt` for the first exercise, and so on.
 
-1. Insert documents into the `students` collection for each of the six remaining students. Use the `insertOne()` command at least once, and the `insertMany()` command at least once.
+1. Insert documents into the `students` collection for each of the six remaining students. Use the `insertOne()` command at least once, and the `insertMany()` command at least once. Include information for student majors and (where applicable) student sports, following the examples given above. Assign `_id` values as follows.
+   - Alice: 4
+   - Bob: 5
+   - Debbie: 6
+   - Eric: 7
+   - Frank: 8
+   - Hannah: 9
 2. Write a query that returns all nine student documents.
 
 ## Retrieving data with MongoDB
@@ -226,41 +323,31 @@ db.collection_name.find({});
 To return only selected fields in your query, pass a second object to `find()`. Use field names with values of `1` to indicate which fields you want. The special `_id` field is included by default.
 
 ```
-> db.visits.find({}, { student_id: 1, check_in_time: 1})
-{ "_id" : 1, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-30T18:35:55Z") }
-{ "_id" : 2, "student_id" : "ccadillac", "check_in_time" : ISODate("2016-08-30T18:55:55Z") }
-{ "_id" : 3, "student_id" : ccadillac", "check_in_time" : ISODate("2016-08-31T15:53:44Z") }
-{ "_id" : 4, "student_id" : "iicehouse", "check_in_time" : ISODate("2016-08-30T19:56:56Z") }
-{ "_id" : 5, "student_id" : "aalbert", "check_in_time" : ISODate("2016-08-30T20:15:05Z") }
-{ "_id" : 6, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-30T20:36:56Z") }
-{ "_id" : 7, "student_id" : "bbooth", "check_in_time" : ISODate("2016-08-30T20:44:54Z") }
-{ "_id" : 8, "student_id" : "eelkins", "check_in_time" : ISODate("2016-08-30T20:49:59Z") }
-{ "_id" : 9, "student_id" : "hhermanson", "check_in_time" : ISODate("2016-08-30T20:55:55Z") }
-{ "_id" : 10, "student_id" : "fforest", "check_in_time" : ISODate("2016-08-30T20:59:05Z") }
-{ "_id" : 11, "student_id" : "fforest", "check_in_time" : ISODate("2016-08-31T15:19:15Z") }
-{ "_id" : 12, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-31T17:36:36Z") }
-{ "_id" : 13, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-31T18:36:56Z") }
-{ "_id" : 14, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-31T20:00:06Z") }
+> db.students.find({}, { last_name: 1, email: 1 })
+{ "_id" : 1, "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net" }
+{ "_id" : 2, "last_name" : "Cadillac", "email" : "ccadillac@dewv.net" }
+{ "_id" : 3, "last_name" : "Icehouse", "email" : "iicehouse@dewv.net" }
+{ "_id" : 4, "last_name" : "Albert", "email" : "aalbert@dewv.net" }
+{ "_id" : 5, "last_name" : "Booth", "email" : "bbooth@dewv.net" }
+{ "_id" : 6, "last_name" : "Davis", "email" : "ddavis@dewv.net" }
+{ "_id" : 7, "last_name" : "Elkins", "email" : "eelkins@dewv.net" }
+{ "_id" : 8, "last_name" : "Forest", "email" : "fforest@dewv.net" }
+{ "_id" : 9, "last_name" : "Hermanson", "email" : "hhermanson@dewv.net" }
 ```
 
 Alternatively, use zeroes to indicate which fields to *exclude*.
 
 ```
-> db.visits.find({}, { _id: 0, check_in_time: 0, check_out_time: 0, location: 0, purpose_achieved: 0})
-{ "student_id" : "ggatehouse", "purpose" : "study hall", "comments" : "New year, fresh start!" }
-{ "student_id" : "ccadillac", "purpose" : "baseball meeting" }
-{ "student_id" : "ccadillac", "purpose" : "get form signature" }
-{ "student_id" : "iicehouse", "purpose" : "Meet SLP instructor", "comments" : "Cubicle B computer is not working." }
-{ "student_id" : "aalbert", "purpose" : "Study hall" }
-{ "student_id" : "ddavis", "purpose" : "Tour of learning center" }
-{ "student_id" : "bbooth", "purpose" : "study hall", "comments" : "New year, fresh start!" }
-{ "student_id" : "eelkins", "purpose" : "Team Meeting", "comments" : "Sorry coach i had wrong time. my bad" }
-{ "student_id" : "hhermanson", "purpose" : "study hall" }
-{ "student_id" : "fforest", "purpose" : "math help", "tutoring" : "Math 101" }
-{ "student_id" : "fforest", "purpose" : "math help", "tutoring" : "MATH 101" }
-{ "student_id" : "ddavis", "purpose" : "Help with paper" }
-{ "student_id" : "ggatehouse", "purpose" : "study hall" }
-{ "student_id" : "ddavis", "purpose" : "MATH 101" }
+> db.students.find({}, { email: 0, first_name: 0, majors: 0, sports: 0 })
+{ "_id" : 1, "last_name" : "Gatehouse", "academic_rank" : "Sophomore", "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor", "residential_status" : "On campus" }
+{ "_id" : 2, "last_name" : "Cadillac", "academic_rank" : "Junior", "residential_status" : "Off campus", "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 3, "last_name" : "Icehouse", "residential_status" : "On campus", "slp_instructor_last_name" : "Studybuddy", "academic_rank" : "Sophomore" }
+{ "_id" : 4, "last_name" : "Albert", "academic_rank" : "Senior", "residential_status" : "On campus", "slp_instructor_first_name" : "Sam", "slp_instructor_last_name" : "Studybuddy" }
+{ "_id" : 5, "last_name" : "Booth", "academic_rank" : "Junior", "residential_status" : "On campus" }
+{ "_id" : 6, "last_name" : "Davis", "academic_rank" : "Sophomore", "residential_status" : "On campus" }
+{ "_id" : 7, "last_name" : "Elkins", "academic_rank" : "Senior", "residential_status" : "Off campus" }
+{ "_id" : 8, "last_name" : "Forest", "academic_rank" : "Sophomore", "residential_status" : "On campus" }
+{ "_id" : 9, "last_name" : "Hermanson", "academic_rank" : "Senior", "residential_status" : "On campus" }
 ```
 
 You cannot combine includes and excludes in the same statement. The `_id` field is an exception to that rule.
@@ -270,9 +357,8 @@ You cannot combine includes and excludes in the same statement. The `_id` field 
 As mentioned earlier, the first document passed to `find()` is a filter. It corresponds to an SQL `WHERE` clause.
 
 ```
-> db.visits.find({ student_id: 'ggatehouse'})
-{ "_id" : 1, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-30T18:35:55Z"), "check_out_time" : ISODate("2016-08-30T19:53:44Z"), "location" : "Albert Hall", "purpose" : "study hall", "purpose_achieved" : "Y", "comments" : "New year, fresh start!" }
-{ "_id" : 13, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-31T18:36:56Z"), "location" : "Albert Hall", "purpose" : "study hall" }
+> db.students.find({ email: 'ggatehouse@dewv.net' })
+{ "_id" : 1, "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
 ```
 
 You can write the kind of compound Boolean expressions that your programming experience would lead you to expect. Here are several examples. (Each begins with a comment. The DBMS ignores anything following a double slash `//`.)
@@ -286,53 +372,31 @@ You can write the kind of compound Boolean expressions that your programming exp
 ...         ]
 ...     }
 ... )
-{ "_id" : "ggatehouse", "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_stats" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 1, "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
 
 > db.students.find(
 ...     {
 ...         $or: [
-...             {first_name: 'Gary'}, {first_name: 'Alice'}
+...             {first_name: 'Gary'}, {first_name: 'Irving'}
 ...         ]
 ...     }
 ... )
-{ "_id" : "ggatehouse", "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_stats" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
-{ "_id" : "aalbert", "first_name" : "Alice", "last_name" : "Albert", "email" : "aalbert@dewv.net", "academic_rank" : "Junior", "residential_status" : "On campus", "majors" : [ "Computer Science" ], "slp_instructor_first_name" : "Sam", "slp_instructor_last_name" : "Studybuddy" }
-
-> // Example: "less than" operator with timestamp data
-> db.visits.find(
-...     {
-...         check_in_time: { 
-...             $lt: ISODate('2016-08-31T00:00:00-04') 
-...         }
-...     },
-...     {
-...         student_id: 1,
-...         check_in_time: 1
-...     }
-... )
-{ "_id" : 1, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-30T18:35:55Z") }
-{ "_id" : 2, "student_id" : "ccadillac", "check_in_time" : ISODate("2016-08-30T18:55:55Z") }
-{ "_id" : 4, "student_id" : "iicehouse", "check_in_time" : ISODate("2016-08-30T19:56:56Z") }
-{ "_id" : 5, "student_id" : "aalbert", "check_in_time" : ISODate("2016-08-30T20:15:05Z") }
-{ "_id" : 6, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-30T20:36:56Z") }
-{ "_id" : 7, "student_id" : "bbooth", "check_in_time" : ISODate("2016-08-30T20:44:54Z") }
-{ "_id" : 8, "student_id" : "eelkins", "check_in_time" : ISODate("2016-08-30T20:49:59Z") }
-{ "_id" : 9, "student_id" : "hhermanson", "check_in_time" : ISODate("2016-08-30T20:55:55Z") }
-{ "_id" : 10, "student_id" : "fforest", "check_in_time" : ISODate("2016-08-30T20:59:05Z") }
+{ "_id" : 1, "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", "academic_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Math", "Computer Science" ], "slp_instructor_first_name" : "Terry", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 3, "first_name" : "Irving", "last_name" : "Icehouse", "email" : "iicehouse@dewv.net", "academic_rank" : "Sophomore", "residential_status" : "On campus", "majors" : [ "Chemistry" ], "slp_instructor_last_name" : "Studybuddy" }
 
 > // Example: "greater than" operator with character data
 > db.students.find(
 ...     {
 ...         last_name: { 
-...             $gt: 'H' 
+...             $gt: 'G'
 ...         }
 ...     },
 ...     {
 ...         last_name: 1
 ...     }
 ... )
-{ "_id" : "iicehouse", "last_name" : "Icehouse" }
-{ "_id" : "hhermanson", "last_name" : "Hermanson" }
+{ "_id" : 1, "last_name" : "Gatehouse" }
+{ "_id" : 3, "last_name" : "Icehouse" }
 ```
 
 Other comparison operators are shown below.
@@ -349,30 +413,35 @@ Other comparison operators are shown below.
 You may recall that special SQL syntax was needed to match `NULL` values.
 
 ```sql
-mysql> select first_name, last_name, check_in_time, check_out_time from visit where check_out_time is NULL;
-+------------+-----------+---------------------+----------------+
-| first_name | last_name | check_in_time       | check_out_time |
-+------------+-----------+---------------------+----------------+
-| Gary       | Gatehouse | 2016-08-31 14:36:56 | NULL           |
-| Debra      | Davis     | 2016-08-31 16:00:06 | NULL           |
-+------------+-----------+---------------------+----------------+
-2 rows in set (0.00 sec)
+mysql> select email from student where slp_instructor_last_name IS NULL;
++---------------------+
+| email               |
++---------------------+
+| bbooth@dewv.net     |
+| ddavis@dewv.net     |
+| eelkins@dewv.net    |
+| fforest@dewv.net    |
+| hhermanson@dewv.net |
++---------------------+
+5 rows in set (0.00 sec)
 ```
 
 Here is the MongoDB equivalent.
 
 ```
-> db.visits.find(
+> db.students.find(
 ...     { 
-...         check_out_time: { $exists: false }
+...         slp_instructor_last_name: { $exists: false }
 ...     },
 ...     {
-...         student_id: 1,
-...         check_out_time: 1
+...         email: 1
 ...     }
 ... )
-{ "_id" : 13, "student_id" : "ggatehouse" }
-{ "_id" : 14, "student_id" : "ddavis" }
+{ "_id" : 5, "email" : "bbooth@dewv.net" }
+{ "_id" : 6, "email" : "ddavis@dewv.net" }
+{ "_id" : 7, "email" : "eelkins@dewv.net" }
+{ "_id" : 8, "email" : "fforest@dewv.net" }
+{ "_id" : 9, "email" : "hhermanson@dewv.net" }
 ```
 
 ### Sorting results
@@ -381,45 +450,49 @@ You can sort results by following the `find()` call with a call to `sort()`. Her
 
 ```
 > db.students.find(
-...     { last_name: { $gt: 'H' }},
-...     { last_name: 1}
+...     {
+...         last_name: { 
+...             $gt: 'G'
+...         }
+...     },
+...     {
+...         last_name: 1
+...     }
 ... ).sort({ last_name: 1})
-{ "_id" : "hhermanson", "last_name" : "Hermanson" }
-{ "_id" : "iicehouse", "last_name" : "Icehouse" }
+{ "_id" : 1, "last_name" : "Gatehouse" }
+{ "_id" : 3, "last_name" : "Icehouse" }
 ```
 
 Here is the same query with a descending sort.
 
 ```
 > db.students.find(
-...     { last_name: { $gt: 'H' }},
-...     { last_name: 1}
+...     {
+...         last_name: { 
+...             $gt: 'G'
+...         }
+...     },
+...     {
+...         last_name: 1
+...     }
 ... ).sort({ last_name: -1})
-{ "_id" : "iicehouse", "last_name" : "Icehouse" }
-{ "_id" : "hhermanson", "last_name" : "Hermanson" }
+{ "_id" : 3, "last_name" : "Icehouse" }
+{ "_id" : 1, "last_name" : "Gatehouse" }
 ```
 
-Finally, here is a primary and secondary sort in different directions. It sorts first by student ID, in ascending order. Where records have the same student ID, they are sorted by check in time, in descending order. 
+Finally, here is a primary and secondary sort in different directions. It sorts first by residential status, in ascending order. Where records have the same residential status, they are sorted by SLP instructor last name, in descending order. 
 
 ```
-> db.visits.find({}, { student_id: 1, check_in_time: 1}).sort(
-...     { student_id: 1, check_in_time: -1}
-... )
-{ "_id" : 5, "student_id" : "aalbert", "check_in_time" : ISODate("2016-08-30T20:15:05Z") }
-{ "_id" : 7, "student_id" : "bbooth", "check_in_time" : ISODate("2016-08-30T20:44:54Z") }
-{ "_id" : 3, "student_id" : "ccadillac", "check_in_time" : ISODate("2016-08-31T15:51:15Z") }
-{ "_id" : 2, "student_id" : "ccadillac", "check_in_time" : ISODate("2016-08-30T18:55:55Z") }
-{ "_id" : 14, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-31T20:00:06Z") }
-{ "_id" : 12, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-31T17:36:36Z") }
-{ "_id" : 6, "student_id" : "ddavis", "check_in_time" : ISODate("2016-08-30T20:36:56Z") }
-{ "_id" : 8, "student_id" : "eelkins", "check_in_time" : ISODate("2016-08-30T20:49:59Z") }
-{ "_id" : 11, "student_id" : "fforest", "check_in_time" : ISODate("2016-08-31T15:19:15Z") }
-{ "_id" : 10, "student_id" : "fforest", "check_in_time" : ISODate("2016-08-30T20:59:05Z") }
-{ "_id" : 13, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-31T18:36:56Z") }
-{ "_id" : 1, "student_id" : "ggatehouse", "check_in_time" : ISODate("2016-08-30T18:35:55Z") }
-{ "_id" : 9, "student_id" : "hhermanson", "check_in_time" : ISODate("2016-08-30T20:55:55Z") }
-{ "_id" : 4, "student_id" : "iicehouse", "check_in_time" : ISODate("2016-08-30T19:56:56Z") }
+> db.students.find({}, { email: 1, residential_status: 1, slp_instructor_last_name
+: 1 }).sort({residential_status: 1, slp_instructor_last_name: -1})
+{ "_id" : 2, "email" : "ccadillac@dewv.net", "residential_status" : "Off campus", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 1, "email" : "ggatehouse@dewv.net", "residential_status" : "On campus", "slp_instructor_last_name" : "Tutor" }
+{ "_id" : 3, "email" : "iicehouse@dewv.net", "residential_status" : "On campus", "slp_instructor_last_name" : "Studybuddy" }
 ```
+
+### Exercise set 21
+
+TBD
 
 ## Updating data with MongoDB
 
@@ -502,7 +575,7 @@ MongoDB defines other field update operators in addition to `$set` and `$unset`.
 
 TBD array updates
 
-### Exercise set TBD
+### Exercise set 22
 
 reverse the changes made in the previous section. Use both One and Many
 
@@ -530,7 +603,9 @@ You might have guessed that MongoDB defines functions named `deleteOne()` and `d
 0
 ```
 
+### Exercise set 23
 
+TBD
 
 ## (De)normalizing data in MongoDB
 
@@ -544,7 +619,7 @@ Use this command to create a document in a new collection to represent visit dat
 > db.visits.insert(
 ...     {
 ...         _id: 1,
-...         student_id: 'ggatehouse',
+...         student_id: 1,
 ...         check_in_time: ISODate('2016-08-30T14:35:55-04'),
 ...         check_out_time: ISODate('2016-08-30T15:53:44-04'),
 ...         location: 'Albert Hall',
@@ -556,7 +631,7 @@ Use this command to create a document in a new collection to represent visit dat
 WriteResult({ "nInserted" : 1 })
 ```
 
-This creates a collection named `visits` and a document in that collection. The `student_id` field is a **reference** that indicates this visit is for the `students` document with `_id: 'ggatehouse'`. In other words, your old friend Gary.
+This creates a collection named `visits` and a document in that collection. The `student_id` field is a **reference** that indicates this visit is for the `students` document with `_id: 1`. In other words, your old friend Gary Gatehouse.
 
 Unlike MySQL, MongoDB strictly follows [ISO 6801 format]( https://www.iso.org/iso-8601-date-and-time-format.html ) by using a capital `T` to separate date and time. Here, the quoted values end with `-04` to indicate [Eastern Daylight Time]( https://www.timeanddate.com/time/zones/edt ). The quoted value is passed to a helper function called `ISODate()`, which handles date/time values in ISO 8601 format. 
 
@@ -590,9 +665,9 @@ Next, create visit documents for Charlie Cadillac.
 
 
 
-### Exercise set TBD
+### Exercise set 24
 
-MongoDB does not have a convenient way to selectively write shell contents to a file. You will need to copy and paste your work for the following exercises using a text editor. Be sure to copy both the MongoDB command(s) and the results that are returned. Use the filename `exerciseTBD-1.txt` for the first exercise, and so on.
+MongoDB does not have a convenient way to selectively write shell contents to a file. You will need to copy and paste your work for the following exercises using a text editor. Be sure to copy both the MongoDB command(s) and the results that are returned. Use the filename `exercise24-1.txt` for the first exercise, and so on.
 
 1. Insert documents into the `visits` collection for each of the eleven remaining visits. Continue to use sequential numbers for `_id` values.
 2. Write a query that returns all fourteen visit documents.
@@ -667,7 +742,7 @@ Now suppose that you were asked to list all students who have visited more than 
 
 This computes the number of visits for each `student_id`, then displays only the documents with a sum greater than one.
 
-### Exercise set 12
+### Exercise set 25
 
 1. Write a single query that lists each gender and how many sports exist for that gender.
 2. Write a single query to list major names and the number of students who have that major. (It is okay if majors with no students are not in the results.)
@@ -678,11 +753,8 @@ This computes the number of visits for each `student_id`, then displays only the
 
 explain
   no schema enforcement
-​    no nulls
-​    possible to mistake data and field names (residential_stats?)
+​    possible to mistake data and field names (residential_status?)
 ​    denormalization
-
-change sports to be array of embedded docs with gender, season, name
 
 example of embedded doc that is not in array? printer?
 
