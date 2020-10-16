@@ -492,120 +492,129 @@ Finally, here is a primary and secondary sort in different directions. It sorts 
 
 ### Exercise set 21
 
-TBD
+1. List the first and last names for all Seniors.
+2. List the first and last names for all Freshmen and Sophomores.
+3. List the first and last names for all students who are *not* Seniors.
+4. List the first and last names of every student, and the sports they play, if any. Sort the results by last name.
+5. List the first and last names of every athlete, and the sport(s) they play. Sort the results by last name.
 
 ## Updating data with MongoDB
 
-Suppose the Learning Center staff are checking which courses have the most demand for tutoring services.
+Suppose that Sam Studybuddy wins the lottery and is no longer working as an SLP instructor. This will affect only one student.
 
 ```
-> db.visits.find({}, { student_id: 1, tutoring: 1}).sort({tutoring: 1})
-{ "_id" : 1, "student_id" : "ggatehouse" }
-{ "_id" : 2, "student_id" : "ccadillac" }
-{ "_id" : 3, "student_id" : "ccadillac" }
-{ "_id" : 4, "student_id" : "iicehouse" }
-{ "_id" : 5, "student_id" : "aalbert" }
-{ "_id" : 6, "student_id" : "ddavis" }
-{ "_id" : 7, "student_id" : "bbooth" }
-{ "_id" : 8, "student_id" : "eelkins" }
-{ "_id" : 9, "student_id" : "hhermanson" }
-{ "_id" : 12, "student_id" : "ddavis" }
-{ "_id" : 13, "student_id" : "ggatehouse" }
-{ "_id" : 14, "student_id" : "ddavis" }
-{ "_id" : 11, "student_id" : "fforest", "tutoring" : "MATH 101" }
-{ "_id" : 10, "student_id" : "fforest", "tutoring" : "Math 101" }
+> db.students.find( 
+... { $and: [ 
+...   { slp_instructor_first_name: "Sam" }, 
+...   { slp_instructor_last_name: "Studybuddy" } 
+...   ] 
+... }, 
+... { email: 1 } 
+... )
+{ "_id" : 4, "email" : "aalbert@dewv.net" }
 ```
 
-First, you might clean up the inconsistent values for the introductory math course.
+The `updateOne()` function uses its first argument as a filter. In the example below, the second argument sets the values of SLP instructor name properties.
 
 ```
-> db.visits.updateOne(
-...     { _id: 10 },
-...     { $set: { tutoring: 'MATH 101'} }
+> db.students.updateOne(
+... { _id: 4 },
+... { $set: { slp_instructor_first_name: "Terry", slp_instructor_last_name: "Tutor" }}
 ... )
 { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
 ```
 
-The `updateOne()` function uses its first argument as a filter, which matches a single document. Turning to the second argument, it sets the value of the `tutoring` field to `'MATH 101'`.
+The response shows that one document matched the filter, and one document was modified. 
 
-Next suppose you discover that some tutoring information was not entered. For example, Charlie Cadillac says that he received Chemistry 101 tutoring at all of his visits.
+Now suppose that a new college policy requires all students to live on campus. So, you want to update off campus students to be on campus. As with SQL, it is a good idea to first `SELECT`/`find` the proper data. This verifies that the filter is correct.
 
 ```
-> db.visits.updateMany(
-...     { student_id: 'ccadillac' },
-...     { $set: { tutoring: 'CHEM 101'} }
-... )
+> db.students.find({ residential_status: "Off campus" }, { email: 1, residential_status: 1 })
+{ "_id" : 2, "email" : "ccadillac@dewv.net", "residential_status" : "Off campus" }
+{ "_id" : 7, "email" : "eelkins@dewv.net", "residential_status" : "Off campus" }
+```
+
+To modify both documents at once, pass the same filter as the first argument to `updateMany()`. The second argument sets a new value for the residential status property.
+
+```
+> db.students.updateMany(
+...     { residential_status: "Off campus" }, 
+...     { $set: { residential_status: "On campus" } }
+...     )
 { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
 ```
 
 The response shows that two documents matched the filter, and both were modified.
 
-The `updateOne()` function processes only the first document matching the filter. So it will always update zero or one documents. As its name suggests, `updateMany()` will process all matching documents. But "process" here does not necessarily mean changes are made, as shown below.
+The `updateOne()` function always modifies zero or one document. If more than one document matches the filter, only one will be modified. (At this point, we will assume that we can't control which, and will take care to ensure that the filters passed to `updateOne()` match at most one document.) In contrast, `updateMany()` will process all matching documents. But "process" here does not necessarily mean changes are made. The modified count will exclude documents that match the filter but would not be modified by the second argument (because they already have those values).
+
+The examples above replace the values of existing properties. The `$set` operator can also define a value for a document property that did not previously exist. 
 
 ```
-> // Example: repeat the query run earlier. 
-> // One document is matched, but none modified.
-> // No modification because the field already has that value.
-> db.visits.updateOne(
-...     { _id: 10 },
-...     { $set: { tutoring: 'MATH 101'} }
-... )
-{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
-
-> // Example: 3 documents matched and modified.
-> db.visits.updateMany(
-...     { student_id: 'ddavis' },
-...     { $set: { tutoring: 'CS 200'} }
-... )
-{ "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
-
-> // Example: updateOne matches at most 1 document.
-> db.visits.updateOne(
-...     { student_id: 'ddavis' },
-...     { $set: { tutoring: 'CS 201'} }
+> db.students.updateOne(
+... { _id: 3 },
+... { $set: { sports: [ { name: "Basketball", gender: "Men" } ] } }
 ... )
 { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
 ```
 
-the first updateOne above is similar to RDBMS. All the other updateOnes and Manys are different because the change shape, analogous to updating NULLs.
+The `$unset` operator does the opposite. It removes the value for a property, like setting a `NULL` in SQL. The following example reverses the change just made.
 
-$unset goes the other direction: sets values to NULL
+```
+> db.students.updateOne( { _id: 3 }, { $unset: { sports: undefined } } )
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+```
 
-MongoDB defines other field update operators in addition to `$set` and `$unset`. These operators modify a field to hold the current date, an incremented value, a specified value only if it is less than the current value, and so forth.
+The value specified for properties that are being `$unset` is ignored. The example uses the JavaScript `undefined` value, but any value would have the same effect.
 
-TBD array updates
+Because some documents already have sports data, the example that adds Irving to the Men's Basketball team is analogous very similar to replacing a `NULL` value in SQL. However, the `$set` operator is more powerful than this suggests. MongoDB is not constrained by pre-existing tabular formats as in a relational database. The following example alters the "shape" or format of all student documents, except the first, by setting a value for a new property that did not previously exist on any of the documents.
+
+```
+> db.students.updateMany(
+... { _id: { $ne: 1 } },
+... { $set: { someFieldThatWasJustDreamedUp: "just because" } }
+... )
+{ "acknowledged" : true, "matchedCount" : 8, "modifiedCount" : 8 }
+```
+
+MongoDB defines other field update operators in addition to `$set` and `$unset`. These operators modify a field to hold the current date, increment its value, set a specified value only if it is less than the current value, and so forth.
 
 ### Exercise set 22
 
-reverse the changes made in the previous section. Use both One and Many
+1. Many lottery winners end later end up broke-- including Sam. Since Sam is back, update Albert's record so that Sam is again his SLP instructor.
+2. Use *two* `updateOne()` statements to reverse the changes from the college's altered residence policy.
+3.  Use `updateMany()` to remove the dreamed up property from all documents.
 
 ## Deleting data with MongoDB
 
 First, execute the following command.
 
 ```
-db.visits.aggregate([ { $match: {} }, { $out: 'temp_visits' } ]);
+db.students.aggregate([ { $match: {} }, { $out: 'temp_students' } ]);
 ```
 
-You will learn more about the `aggregate()` function later. Here, it is used to make a copy of the `visits` collection, named `temp_visits`. You will use the `temp_visits` collection to practice deleting data.
+You will learn more about the `aggregate()` function later. Here, it is used to make a copy of the `students` collection, named `temp_students`. You will use the `temp_students` collection to practice deleting data.
 
 You might have guessed that MongoDB defines functions named `deleteOne()` and `deleteMany()`. They use the same filtering as other commands.
 
 ```
 > // Don't forget to use the temporary collection!
-> db.temp_visits.deleteOne( { student_id: 'ddavis'})
+> db.temp_students.deleteOne( { email: 'ddavis@dewv.net'})
 { "acknowledged" : true, "deletedCount" : 1 }
 
-> db.temp_visits.deleteMany( { student_id: 'ddavis'})
-{ "acknowledged" : true, "deletedCount" : 2 }
+> db.temp_students.deleteMany( { academic_rank: 'Sophomore'})
+{ "acknowledged" : true, "deletedCount" : 3 }
 
-> db.temp_visits.count( { student_id: 'ddavis' })
+> db.students.count({ academic_rank: 'Sophomore' }
 0
 ```
 
 ### Exercise set 23
 
-TBD
+Be sure to use the temporary collection!
+
+1. Use `deleteOne()` to delete a single document from the temporary collection.
+2. Use `deleteMany()` to delete all remaining documents from temporary collection.
 
 ## (De)normalizing data in MongoDB
 
