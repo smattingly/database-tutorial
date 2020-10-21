@@ -514,7 +514,7 @@ Suppose that Sam Studybuddy wins the lottery and is no longer working as an SLP 
 { "_id" : 4, "email" : "aalbert@dewv.net" }
 ```
 
-The `updateOne()` function uses its first argument as a filter. In the example below, the second argument sets the values of SLP instructor name properties.
+The `updateOne()` function uses its first argument as a filter. In the example below, the second argument changes the values of SLP instructor name properties for the affected student.
 
 ```
 > db.students.updateOne(
@@ -567,7 +567,7 @@ The `$unset` operator does the opposite. It removes the value for a property, li
 
 The value specified for properties that are being `$unset` is ignored. The example uses the JavaScript `undefined` value, but any value would have the same effect.
 
-Because some documents already have sports data, the example that adds Irving to the Men's Basketball team is analogous very similar to replacing a `NULL` value in SQL. However, the `$set` operator is more powerful than this suggests. MongoDB is not constrained by pre-existing tabular formats as in a relational database. The following example alters the "shape" or format of all student documents, except the first, by setting a value for a new property that did not previously exist on any of the documents.
+Because some documents already have sports data, the example that adds Irving to the Men's Basketball team is analogous to replacing a `NULL` value in SQL. However, the `$set` operator is more powerful than this suggests. MongoDB is not constrained by pre-existing tabular formats as in a relational database. The following example alters the "shape" or format of all student documents, except the first, by setting a value for a new property that did not previously exist on any of the documents.
 
 ```
 > db.students.updateMany(
@@ -577,11 +577,16 @@ Because some documents already have sports data, the example that adds Irving to
 { "acknowledged" : true, "matchedCount" : 8, "modifiedCount" : 8 }
 ```
 
-MongoDB defines other field update operators in addition to `$set` and `$unset`. These operators modify a field to hold the current date, increment its value, set a specified value only if it is less than the current value, and so forth.
+MongoDB defines other field update operators in addition to `$set` and `$unset`. These include operators that:
+
+- modify a field to hold the current date, 
+- increment a field's value, 
+- set a specified value only if it is less than the fields current value, and
+- modify the contents of array-valued fields without requiring you to re`$set` the entire array.
 
 ### Exercise set 22
 
-1. Many lottery winners end later end up broke-- including Sam. Since Sam is back, update Albert's record so that Sam is again his SLP instructor.
+1. Many lottery winners later end up broke-- including Sam. Since Sam is back, update Albert's record so that Sam is again his SLP instructor.
 2. Use *two* `updateOne()` statements to reverse the changes from the college's altered residence policy.
 3.  Use `updateMany()` to remove the dreamed up property from all documents.
 
@@ -613,10 +618,10 @@ You might have guessed that MongoDB defines functions named `deleteOne()` and `d
 
 Be sure to use the temporary collection!
 
-1. Use `deleteOne()` to delete a single document from the temporary collection.
-2. Use `deleteMany()` to delete all remaining documents from temporary collection.
+1. Use `deleteOne()` to delete any single document from the temporary collection.
+2. Use `deleteMany()` to delete *all* the remaining documents from the temporary collection.
 
-## (De)normalizing data in MongoDB
+## Normalizing data with MongoDB references
 
 You have seen one way to model one-to-many relationships in MongoDB: one student has many majors, and those majors can be modeled as an array embedded within the student document. This is a denormalized approach. The equivalent structure in a relational database would be a repeating group, which fails to meet first normal form.
 
@@ -625,67 +630,88 @@ MongoDB supports a second, more normalized approach to modeling one-to-many rela
 Use this command to create a document in a new collection to represent visit data.
 
 ```
-> db.visits.insert(
-...     {
-...         _id: 1,
-...         student_id: 1,
-...         check_in_time: ISODate('2016-08-30T14:35:55-04'),
-...         check_out_time: ISODate('2016-08-30T15:53:44-04'),
-...         location: 'Albert Hall',
-...         purpose: 'study hall',
-...         purpose_achieved: 'Y',
-...         comments: 'New year, fresh start!'
-...     }
+> db.visits.insertOne(
+...   {
+...     _id: 1,
+...     students_id: 1,
+...     check_in_time: "2016-08-30 14:35:55",
+...     check_out_time: "2016-08-30 15:53:44",
+...     location: "Albert Hall",
+...     purpose: "study hall",
+...     purpose_achieved: "Y",
+...     comments: "New year, fresh start!",
+...   }
 ... )
-WriteResult({ "nInserted" : 1 })
+{ "acknowledged" : true, "insertedId" : 1 }
 ```
 
-This creates a collection named `visits` and a document in that collection. The `student_id` field is a **reference** that indicates this visit is for the `students` document with `_id: 1`. In other words, your old friend Gary Gatehouse.
+This creates a collection named `visits` and a document in that collection. The `students_id` field is a **reference** that indicates this visit is for the `students` document with `_id: 1`. In other words, your old friend Gary Gatehouse.
 
-Unlike MySQL, MongoDB strictly follows [ISO 6801 format]( https://www.iso.org/iso-8601-date-and-time-format.html ) by using a capital `T` to separate date and time. Here, the quoted values end with `-04` to indicate [Eastern Daylight Time]( https://www.timeanddate.com/time/zones/edt ). The quoted value is passed to a helper function called `ISODate()`, which handles date/time values in ISO 8601 format. 
-
-Next, create visit documents for Charlie Cadillac.
+Gary's visit has the earliest check in on record. Here are the next two.
 
 ```
-> db.visits.insertMany(
-...     [
-...         {
-...             _id: 2,
-...             student_id: 'ccadillac',
-...             check_in_time: ISODate('2016-08-30T14:55:55-04'),
-...             check_out_time: ISODate('2016-08-30T16:53:44-04'),
-...             location: 'Albert Hall',
-...             purpose: 'baseball meeting',
-...             purpose_achieved: '?'
-...         },
-...         {
-...             _id: 3, 
-...             student_id: 'ccadillac',
-...             check_in_time: ISODate('2016-08-31T11:51:15-04'),
-...             check_out_time: ISODate('2016-08-31T11:53:44-04'),
-...             location: 'Albert Hall',
-...             purpose: 'get form signature',
-...             purpose_achieved: 'Y'   
-...         }
-...     ]
-... )
+> db.visits.insertMany([
+...   {
+...     _id: 2,
+...     students_id: 2,
+...     check_in_time: "2016-08-30 14:55:55",
+...     check_out_time: "2016-08-30 16:53:44",
+...     location: "Albert Hall",
+...     purpose: "baseball meeting",
+...     purpose_achieved: "?",
+...   },
+...   {
+...     _id: 3,
+...     students_id: 3,
+...     check_in_time: "2016-08-30 15:56:56",
+...     check_out_time: "2016-08-30 16:56:46",
+...     location: "Albert Hall",
+...     purpose: "Meet SLP instructor",
+...     purpose_achieved: "Y",
+...     comments: "Cubicle B computer is not working.",
+...   },
+... ]);
 { "acknowledged" : true, "insertedIds" : [ 2, 3 ] }
 ```
 
+The `students_id` references can be used with the `aggregate()` function to "join" the two collections.
 
+```
+> db.students.aggregate([
+... {
+...    $lookup:
+...      {
+...        from: "visits",
+...        localField: "_id",
+...        foreignField: "students_id",
+...        as: "visits_array"
+...      }
+... }
+... ])
+{ "_id" : 1, "first_name" : "Gary", "last_name" : "Gatehouse", "email" : "ggatehouse@dewv.net", ... "visits_array" : [ { "_id" : 1, "students_id" : 1, "check_in_time" : "2016-08-30 14:35:55", "check_out_time" : "2016-08-30 15:53:44", "location" : "Albert Hall", "purpose" : "study hall", "purpose_achieved" : "Y", "comments" : "New year, fresh start!" } ] }
+{ "_id" : 2, "first_name" : "Charlie", "last_name" : "Cadillac", "email" : "ccadillac@dewv.net", ... "visits_array" : [ { "_id" : 2, "students_id" : 2, "check_in_time" : "2016-08-30 14:55:55", "check_out_time" : "2016-08-30 16:53:44", "location" : "Albert Hall", "purpose" : "baseball meeting", "purpose_achieved" : "?" } ] }
+...
+{ "_id" : 9, "first_name" : "Hannah", "last_name" : "Hermanson", "email" : "hhermanson@dewv.net", ... "visits_array" : [ ] }
+```
+
+To save space, only partial results are shown.
+
+The statement above processes all `students` documents; for each, it uses the `_id` field value to look up  `visits` documents with the same value in `students_id`. The matching `visits` documents are inserted into the results as a field named `visits_array`.
+
+So, results for both Gary and Charlie have a `visits_array` field containing their `visits` documents. Notice that Hannah's results have an empty `visits_array`. The actual results include all `students` documents (although the output shown has been condensed to save space). So the `$lookup` aggregator is like a left outer join.
 
 ### Exercise set 24
 
-MongoDB does not have a convenient way to selectively write shell contents to a file. You will need to copy and paste your work for the following exercises using a text editor. Be sure to copy both the MongoDB command(s) and the results that are returned. Use the filename `exercise24-1.txt` for the first exercise, and so on.
-
-1. Insert documents into the `visits` collection for each of the eleven remaining visits. Continue to use sequential numbers for `_id` values.
-2. Write a query that returns all fourteen visit documents.
-
-
+1. The `$lookup` query shown above is the equivalent of `students LEFT OUTER JOIN visits` in SQL. Write a `$lookup` query that is the equivalent of `visits LEFT OUTER JOIN students`. Before you run it, predict the number of result documents. Run the query, to see if you were correct, and explain the result count.
+2. Insert documents into the `visits` collection for each of the eleven remaining visits. Use the data values from the MySQL table `visit2nf`, with the rows sorted by ascending check in time. Continue to use sequential `_id` values.
+3. To verify results of the previous exercise, write a query that returns all fourteen visit documents.
+4. Repeat the `$lookup` query shown above to produce full results of `students` "joined" with (the now expanded collection) `visits`.
 
 ## Aggregating data
 
-MongoDB supports several forms of aggregation. 
+The MongoDB syntax for "joins" is the `aggregate()` function with a `$lookup` operator.
+
+But as the name suggests, most  `aggregate()` operators have nothing to do with joins.
 
 There is a small number of "single purpose aggregation operations", which aggregate data from a single collection. One example you have already seen is `count()`.
 
@@ -694,21 +720,11 @@ There is a small number of "single purpose aggregation operations", which aggreg
 14
 ```
 
-Another is `distinct()`.
+Another example is `distinct()`.
 
 ```
-> db.visits.distinct('student_id')
-[
-        "aalbert",
-        "bbooth",
-        "ccadillac",
-        "ddavis",
-        "eelkins",
-        "fforest",
-        "ggatehouse",
-        "hhermanson",
-        "iicehouse"
-]
+> db.visits.distinct("location")
+[ "Albert Hall", "Writing center" ]
 ```
 
 More advanced aggregation can be performed using MongoDB's "multi-stage aggregation pipeline." Each stage or step in the pipeline transforms its input to an aggregate that can, optionally, become the input to another stage.
@@ -718,58 +734,51 @@ Suppose you want to know how many visits were made by *each* student.
 ```
 > db.visits.aggregate(
 ...     [
-...         {'$group': {_id: '$student_id', visits: {$sum: 1}}}
+...         {'$group': {_id: '$students_id', visits: {$sum: 1}}}
 ...     ]
 ... )
-{ "_id" : "bbooth", "visits" : 1 }
-{ "_id" : "fforest", "visits" : 2 }
-{ "_id" : "hhermanson", "visits" : 1 }
-{ "_id" : "ddavis", "visits" : 3 }
-{ "_id" : "eelkins", "visits" : 1 }
-{ "_id" : "ccadillac", "visits" : 2 }
-{ "_id" : "ggatehouse", "visits" : 2 }
-{ "_id" : "iicehouse", "visits" : 1 }
-{ "_id" : "aalbert", "visits" : 1 }
+{ "_id" : 8, "visits" : 2 }
+{ "_id" : 9, "visits" : 1 }
+{ "_id" : 5, "visits" : 1 }
+{ "_id" : 6, "visits" : 3 }
+{ "_id" : 7, "visits" : 1 }
+{ "_id" : 1, "visits" : 2 }
+{ "_id" : 2, "visits" : 2 }
+{ "_id" : 3, "visits" : 1 }
+{ "_id" : 4, "visits" : 1 }
 ```
 
-The `aggregate()` function's argument is an array whose elements are stages in the aggregation pipeline. Here, there is only one stage. The `$group` stage is similar to an SQL `GROUP BY` clause. It takes its inputs (here, all the documents in the `visits` collection) and outputs a document for each distinct `student_id` value. The output documents have two fields: one for the student id, and one for that student's number of visits. The second field's value is calculated as a sum of the constant expression `1` across all the documents.
+The `aggregate()` function's argument is an array whose elements are stages in the aggregation pipeline. Here, there is only one stage. The `$group` stage is similar to an SQL `GROUP BY` clause. It takes its inputs (here, all the documents in the `visits` collection) and outputs a document for each distinct `students_id` value. The output documents have two fields: one for a student's id, and one for that student's number of visits. The second field's value is calculated as a sum of the constant expression `1` across all the documents.
 
 Now suppose that you were asked to list all students who have visited more than once. You can expand the preceding query by adding a second stage to the aggregation pipeline. The nine documents generated by the preceding query become the inputs to this second stage, which filters for documents that match a condition.
 
 ```
 > db.visits.aggregate(
 ...     [
-...         {'$group': {_id: '$student_id', visits: {$sum: 1}}},
+...         {'$group': {_id: '$students_id', visits: {$sum: 1}}},
 ...         {'$match': {visits: { $gt: 1}}}
 ...     ]
 ... )
-{ "_id" : "fforest", "visits" : 2 }
-{ "_id" : "ddavis", "visits" : 3 }
-{ "_id" : "ccadillac", "visits" : 2 }
-{ "_id" : "ggatehouse", "visits" : 2 }
+{ "_id" : 8, "visits" : 2 }
+{ "_id" : 6, "visits" : 3 }
+{ "_id" : 1, "visits" : 2 }
+{ "_id" : 2, "visits" : 2 }
 ```
 
-This computes the number of visits for each `student_id`, then displays only the documents with a sum greater than one.
+This computes the number of visits for each `students_id`, then displays only the documents with a sum greater than one.
 
 ### Exercise set 25
 
 1. Write a single query that lists each gender and how many sports exist for that gender.
 2. Write a single query to list major names and the number of students who have that major. (It is okay if majors with no students are not in the results.)
-3. Write a single query to answer this question: how many computers have less than 8GB of memory?
+3. Create a new collection, `computers` and insert documents with the data from the MySQL table `computer`. Then write a single query to answer this question: how many computers have less than 8GB of memory?
 4. Write a single query to list the locations that have more than one SLP instructor.
 
 ---
 
-explain
-  no schema enforcement
-​    possible to mistake data and field names (residential_status?)
-​    denormalization
-
 example of embedded doc that is not in array? printer?
 
 upsert?
-
-lookup/join
 
 constraints?
 
