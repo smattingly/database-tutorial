@@ -802,13 +802,242 @@ It is possible to apply both `$match` stages. This query lists students who have
 { "_id" : 2, "visits" : 2 }
 ```
 
+Incidentally, MongoDB defines views (virtual collections) in terms of an aggregation pipeline. The following command creates a view named `athletes`, based on documents in the `students` collection, as processed by a single-stage aggregation pipeline.
+
+```
+> db.createView("athletes", "students", [ { $match: { sports: { $exists: true } } } ] )
+{ "ok" : 1 }
+```
+
+MongoDB views are read-only.
+
+
+```
+> db.athletes.find( { }, { email: 1 } )
+{ "_id" : 2, "email" : "ccadillac@dewv.net" }
+{ "_id" : 5, "email" : "bbooth@dewv.net" }
+{ "_id" : 6, "email" : "ddavis@dewv.net" }
+{ "_id" : 7, "email" : "eelkins@dewv.net" }
+> db.athletes.deleteOne( { _id: 2 } )
+2020-10-28T23:35:04.128+0000 E QUERY    [js] WriteError: Namespace learning_center.athletes is a view, not a collection
+```
+
+
 ### Exercise set 25
 
-1. Create a new collection, `computers` and insert documents with the data from the MySQL table `computer`. Then write a single query to answer this question: how many computers have less than 8GB of memory?
+1. Create a new collection named `computers` and insert documents with the data from the MySQL table `computer`. Then write a single query to answer this question: how many computers have less than 8GB of memory?
 2. Write a single query to list the number of visits at each location.
 3. Write a single query to list the number of students in each academic rank.
 4. Modify the preceding query to count only commuter students.
 5. Write a single query to list students who have made more than one visit at the Albert Hall location, and the number of visits they made there.
+
+## Indexes
+
+As with SQL, MongoDB indexes have two distinct purposes. First, indexes can improve the performance of data retrieval (at the cost of additional storage, plus time to update indexes when data changes). Second, indexes can enforce data constraints-- particularly uniqueness constraints.
+
+MongoDB automatically creates a unique index on each collection's built-in `_id` field. You can create others.
+
+```
+> db.students.createIndex({ email: 1 }, { unique: true })
+{
+        "createdCollectionAutomatically" : false,
+        "numIndexesBefore" : 1,
+        "numIndexesAfter" : 2,
+        "ok" : 1
+}
+```
+
+There is now a unique index on the `email` field of the `students` collection; duplicate entries will not be permitted.
+
+The following command shows all indexes defined for the collection: the built-in `_id` index as well as the `email` index just created.
+
+```
+> db.students.getIndexes()
+[
+        {
+                "v" : 2,
+                "key" : {
+                        "_id" : 1
+                },
+                "name" : "_id_",
+                "ns" : "learning_center.students"
+        },
+        {
+                "v" : 2,
+                "unique" : true,
+                "key" : {
+                        "email" : 1
+                },
+                "name" : "email_1",
+                "ns" : "learning_center.students"
+        }
+]
+```
+
+As with SQL, you can ask MongoDB to explain how it will process a query. The following command explains the strategy for processing a `find()` call on the `visits` collection, filtering on specified values for two fields. The details are beyond the scope of this tutorial, but note that the "winning plan" will use a collection scan (`COLLSCAN`)-- the equivalent of an expensive table scan in a relational DBMS.
+
+```
+> db.visits.explain().find( { $and: [ { students_id: 8 }, { check_in_time: "2016-08-31 11:19:15"} ] } )
+{
+        "queryPlanner" : {
+                "plannerVersion" : 1,
+                "namespace" : "learning_center.visits",
+                "indexFilterSet" : false,
+                "parsedQuery" : {
+                        "$and" : [
+                                {
+                                        "check_in_time" : {
+                                                "$eq" : "2016-08-31 11:19:15"
+                                        }
+                                },
+                                {
+                                        "students_id" : {
+                                                "$eq" : 8
+                                        }
+                                }
+                        ]
+                },
+                "winningPlan" : {
+                        "stage" : "COLLSCAN",
+                        "filter" : {
+                                "$and" : [
+                                        {
+                                                "check_in_time" : {
+                                                        "$eq" : "2016-08-31 11:19:15"
+                                                }
+                                        },
+                                        {
+                                                "students_id" : {
+                                                        "$eq" : 8
+                                                }
+                                        }
+                                ]
+                        },
+                        "direction" : "forward"
+                },
+                "rejectedPlans" : [ ]
+        },
+        "serverInfo" : {
+                "host" : "ws-ae5f4d7b-56a7-49ae-ac74-3e88d70ee3b5",
+                "port" : 27017,
+                "version" : "4.0.19",
+                "gitVersion" : "7e28f4296a04d858a2e3dd84a1e79c9ba59a9568"
+        },
+        "ok" : 1
+}
+```
+
+You can improve the performance of that and similar queries by creating this "compound" index on the two fields used in the filter.
+
+```
+> db.visits.createIndex( { students_id: 1, check_in_time: 1 }, { unique: true } )
+{
+        "createdCollectionAutomatically" : false,
+        "numIndexesBefore" : 1,
+        "numIndexesAfter" : 2,
+        "ok" : 1
+}
+```
+
+Now an `explain()` on the same query shows that the index will be used.
+
+```
+> db.visits.explain().find( { $and: [ { students_id: 8 }, { check_in_time: "2016-08-31 11:19:15"} ] } )
+{
+        "queryPlanner" : {
+                "plannerVersion" : 1,
+                "namespace" : "learning_center.visits",
+                "indexFilterSet" : false,
+                "parsedQuery" : {
+                        "$and" : [
+                                {
+                                        "check_in_time" : {
+                                                "$eq" : "2016-08-31 11:19:15"
+                                        }
+                                },
+                                {
+                                        "students_id" : {
+                                                "$eq" : 8
+                                        }
+                                }
+                        ]
+                },
+                "winningPlan" : {
+                        "stage" : "FETCH",
+                        "inputStage" : {
+                                "stage" : "IXSCAN",
+                                "keyPattern" : {
+                                        "students_id" : 1,
+                                        "check_in_time" : 1
+                                },
+                                "indexName" : "students_id_1_check_in_time_1",
+                                "isMultiKey" : false,
+                                "multiKeyPaths" : {
+                                        "students_id" : [ ],
+                                        "check_in_time" : [ ]
+                                },
+                                "isUnique" : true,
+                                "isSparse" : false,
+                                "isPartial" : false,
+                                "indexVersion" : 2,
+                                "direction" : "forward",
+                                "indexBounds" : {
+                                        "students_id" : [
+                                                "[8.0, 8.0]"
+                                        ],
+                                        "check_in_time" : [
+                                                "[\"2016-08-31 11:19:15\", \"2016-08-31 11:19:15\"]"
+                                        ]
+                                }
+                        }
+                },
+                "rejectedPlans" : [ ]
+        },
+        "serverInfo" : {
+                "host" : "ws-ae5f4d7b-56a7-49ae-ac74-3e88d70ee3b5",
+                "port" : 27017,
+                "version" : "4.0.19",
+                "gitVersion" : "7e28f4296a04d858a2e3dd84a1e79c9ba59a9568"
+        },
+        "ok" : 1
+}
+```
+
+Recall that `updateOne()` and `deleteOne()` calls affect only the first document (if any) matching the provided filter. Generally, MongoDB designers create unique indexes for the field sets that will be used in such filters. This ensures that the operation affects only a clearly identified single document.
+
+MongoDB indexes do not have to be unique. Simply omit the second argument to create a non-unique index.
+
+```
+> db.students.createIndex( { majors: 1 } )
+{
+        "createdCollectionAutomatically" : false,
+        "numIndexesBefore" : 2,
+        "numIndexesAfter" : 3,
+        "ok" : 1
+}
+```
+
+Notice that the index just created is on the `majors` field, which is an embedded array within the `students` documents. The index can speed up the performance of queries like the following.
+
+```
+> db.students.find( { majors: "Computer Science" }, { email: 1, majors: 1 } )
+{ "_id" : 1, "email" : "ggatehouse@dewv.net", "majors" : [ "Math", "Computer Science" ] }
+{ "_id" : 4, "email" : "aalbert@dewv.net", "majors" : [ "Computer Science" ] }
+{ "_id" : 5, "email" : "bbooth@dewv.net", "majors" : [ "Computer Science", "Philosophy" ] }
+```
+
+### Exercise set 26
+
+1. Create an index on the `computers` collection, corresponding to the primary key in the MySQL table. 
+2. Create an index on the `students` collection's `sports` field. 
+3. Compare and contrast the (My)SQL and NoSQL(MongoDB) features that ensure entity integrity. Is either significantly better than the other?
+4. Compare and contrast the (My)SQL and NoSQL(MongoDB) features that ensure referential integrity. Is either significantly better than the other?
+
+## Data integrity
+
+Like MySQL, MongoDB provides special utility programs to backup and restore the contents of a database while the underlying files are held open by the running DBMS server. These utilities are called `mongodump` and `mongorestore`.
+
+MongoDB also matches SQL's concept of transactions. However, MongoDB transaction processing is usually  performed in applications programs that use an API to communicate with a MongoDB server. It is possible to manage transactions in the `mongo` shell, but it is both awkward and limited.
 
 # Contents
 
